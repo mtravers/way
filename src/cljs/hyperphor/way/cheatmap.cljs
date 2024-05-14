@@ -1,0 +1,179 @@
+(ns hyperphor.way.cheatmap
+  (:require [hyperphor.way.vega :as v]
+            [hyperphor.way.cluster :as cluster]
+            [hyperphor.way.web-utils :as wu]
+            )
+  )
+
+;;; TODO row/col annotations w colors and scales, see examples
+;;; TODO more parameterization incl option to have tree on right side
+
+(defn tree
+  [cluster-data left?]
+  (let [width-signal (if left? "dend_width" "hm_width")
+        height-signal (if left? "hm_height" "dend_width")]
+    `{:type "group"
+      :style "cell"
+      :data 
+      [{:name "links"
+        :source ~cluster-data
+        :transform
+        [{:type "treelinks"}
+         {:type "linkpath"
+          :orient ~(if left? "horizontal" "vertical")
+          :shape "orthogonal"}]}]
+      :encoding {:width {:signal ~width-signal} 
+                 :height {:signal ~height-signal}
+                 :strokeWidth {:value 0}}
+      :marks [{:type "path"
+               :from {:data "links"}
+               :encode {:enter
+                        {:path {:field "path"}
+                         :stroke {:value "#666"}}}}]
+      }))
+
+
+;;; Generates TWO data specs (for full tree, and filtered to leaves)
+(defn tree-data-spec
+  [name clusters left?]
+  `[{:name ~name
+     :values ~clusters
+     :transform
+     [{:type "stratify" :key "id" :parentKey "parent"}
+      {:type "tree"
+       :method "cluster"
+       :size [{:signal ~(if left? "hm_height" "hm_width")} ;;  
+              {:signal "dend_width"}]
+       :as ~(if left?
+              ["y" "x" "depth" "children"]
+              ["x" "y" "depth" "children"])}]}
+    {:name ~(str name "-leaf")
+     :source ~name
+     :transform [{:type "filter" :expr "datum.children == 0"}]}]
+  )
+
+
+(defn spec
+  [data h-field v-field value-field h-clusters v-clusters]
+  (let [hsize (count (distinct (map h-field data))) ;wanted to this in vega but circularities are interfering
+        vsize (count (distinct (map v-field data)))]
+    `{:description "A clustered heatmap with side-dendrograms"
+      :$schema "https://vega.github.io/schema/vega/v5.json"
+      :layout {:align "each"
+               :columns 2}
+      :data [{:name "hm"
+              :values ~data}
+             ~@(tree-data-spec "ltree" h-clusters true)
+             ~@(tree-data-spec "utree" v-clusters false)
+             ]
+      :scales
+      ;; Note: min is because sorting apparently requires an aggregation? And there's no pickone
+      [{:name "sx" :type "band" :domain  {:data "utree-leaf" :field "id" :sort {:field "x" :op "min"}} :range {:step 20} } 
+       {:name "sy" :type "band" :domain  {:data "ltree-leaf" :field "id" :sort {:field "y" :op "min"}} :range {:step 20}} 
+       {:name "color"
+        :type "linear"
+        :range {:scheme "BlueOrange"}
+        :domain {:data "hm" :field ~value-field}
+        }]
+      :signals
+      [{:name "hm_width" :value ~(* 20 vsize)} ; :update "length(data(\"utree-leaf\"))" } ;TODO 20 x counts
+       {:name "hm_height" :value ~(* 20 hsize)}
+       {:name "dend_width" :value 60}]
+      :padding 5
+      :marks
+      [
+       {:type :group                       ;Empty quadrant
+        :style :cell
+        :encode {:enter {:width {:signal "dend_width"}
+                         :height {:signal "dend_width"}
+                         :strokeWidth {:value 0}
+                         }
+                 }
+        }
+
+       ;; V tree
+       ~(tree "utree" false)
+
+       ;; H tree
+       ~(tree "ltree" true)
+
+       ;; actual hmap 
+       {:type "group"
+        :name "heatmap"
+        :style "cell"
+        :encode {
+                 :update {
+                          :width {:signal "hm_width"}
+                          :height {:signal "hm_height"}
+                          }
+                 }
+
+        :axes
+        [{:orient :right :scale :sy :title ~(wu/humanize h-field) } 
+         {:orient :bottom :scale :sx :labelAngle 90 :labelAlign "left" :labelOffset 5 :title ~(wu/humanize v-field)}]
+
+        :legends
+        [{:fill :color
+          :type :gradient
+          :title ~(wu/humanize value-field)
+          :titleOrient "bottom"
+          :gradientLength {:signal "hm_height"} ;TODO was /2 but in Wayne, looks better this way
+          }]
+
+        :marks
+        [{:type "rect"
+          :from {:data "hm"}
+          :encode
+          {:enter
+           {:y {:field ~h-field :scale "sy"}
+            :x {:field ~v-field :scale "sx"}
+            :width {:value 19} :height {:value 19}
+            :fill {:field ~value-field :scale "color"}
+            }}}
+         ]
+        }
+       ]}) )
+
+;;; This is the top-level call. Takes data and three field designators, does clustering on both dimensions
+;;; and outputs a heatmap with dendrograms
+(defn dendrogram
+  [data row-field col-field value-field]
+  (let [cluster-l (cluster/cluster-data data row-field col-field value-field )
+        cluster-u (cluster/cluster-data data col-field row-field value-field )]
+    [v/vega-view (spec data row-field col-field value-field cluster-l cluster-u) []])
+  )
+
+
+
+#_
+(defn dendrogram-url
+  [url row-field col-field value-field]
+  (let [data @(rf/subscribe [:data [:url {:url url}]])]
+    (when data
+      (dendrogram data row-field col-field value-field))))
+
+#_
+(defn dev-ui
+  []
+  [:div
+   ;; Clustering doesn't look very convincing!
+   ;; Also, needs to do an aggregation, outside of vega
+   ;; -url
+   ;; 
+
+   #_
+   (dendrogram movies
+               :distributor
+               :genre
+               :gross
+               
+               )
+
+      (dendrogram data2
+               :gene 
+               :sample
+               :value
+               
+               )
+
+   ])

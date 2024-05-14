@@ -1,0 +1,33 @@
+{
+    "name": "way",
+    "version": "1.0.0",
+    "description": "data-oriented website plaftorm",
+    "main": "index.js",
+    "directories": {
+        "doc": "doc",
+        "test": "test"
+    },
+    "dependencies": {
+        "ag-grid-community": "^31.0.1",
+        "ag-grid-enterprise": "^31.0.1",
+        "ag-grid-react": "^31.0.1",
+        "create-react-class": "^15.7.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-vega": "^7.6.0"
+    },
+    "devDependencies": {
+        "shadow-cljs": "2.26.5"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/cdd/pharmakb-traverse.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "homepage": "https://github.com/parkerici/wayne"
+}
