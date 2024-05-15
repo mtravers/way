@@ -8,6 +8,7 @@
    [hyperphor.way.flash :as flash]
    [hyperphor.way.modal :as modal]
    [hyperphor.way.web-utils :as wu]
+   [hyperphor.way.demo.heatmap :as hm]
    [org.candelbio.multitool.core :as u]
    [org.candelbio.multitool.browser :as browser]
    )) 
@@ -50,6 +51,7 @@
     :tab
     (array-map
      :home about
+     :heatmap hm/ui
      )]
    #_ [footer]
    ])
