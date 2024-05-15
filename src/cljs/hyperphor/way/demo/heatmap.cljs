@@ -161,29 +161,17 @@
  {:gene "MAOA", :sample "509", :value "7.58181859772461"}
  {:gene "MAOA", :sample "517", :value "7.73478409076481"}
  {:gene "MAOA", :sample "516", :value "4.70786106177427"}
- {:gene "MAOA", :sample "513", :value "7.75164740340675"}))
+ {:gene "MAOA", :sample "513", :value "7.75164740340675"}
+    ))
 
 (defn ui
   []
   [:div
-   ;; Clustering doesn't look very convincing!
-   ;; Also, needs to do an aggregation, outside of vega
-   ;; -url
-   ;; 
+   [:p "A recreation of an R example from " [:a {:href "https://bioinformatics.ccr.cancer.gov/docs/btep-coding-club/CC2023/complex_heatmap_enhanced_volcano/"} "here"]]
 
-   #_
-   (dendrogram movies
-               :distributor
-               :genre
-               :gross
-               
-               )
-
-      (ch/dendrogram data2
-               :gene 
-               :sample
-               :value
-               
-               )
-
-   ])
+   [:div.row
+    [:div.col-4
+     [ch/dendrogram data2 :gene :sample :value]]
+    [:div.col-8
+     [:img {:src "https://bioinformatics.ccr.cancer.gov/docs/btep-coding-club/CC2023/complex_heatmap_enhanced_volcano_files/figure-html/unnamed-chunk-6-1.png"
+            :height 500}]]]])

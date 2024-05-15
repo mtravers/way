@@ -8,6 +8,7 @@
 ;;; TODO row/col annotations w colors and scales, see examples
 ;;; TODO more parameterization incl option to have tree on right side
 
+;;; Generates the spec for a single tree 
 (defn tree
   [cluster-data left?]
   (let [width-signal (if left? "dend_width" "hm_width")
@@ -31,7 +32,6 @@
                         {:path {:field "path"}
                          :stroke {:value "#666"}}}}]
       }))
-
 
 ;;; Generates TWO data specs (for full tree, and filtered to leaves)
 (defn tree-data-spec
@@ -76,48 +76,42 @@
         :domain {:data "hm" :field ~value-field}
         }]
       :signals
-      [{:name "hm_width" :value ~(* 20 vsize)} ; :update "length(data(\"utree-leaf\"))" } ;TODO 20 x counts
+      [{:name "hm_width" :value ~(* 20 vsize)}
        {:name "hm_height" :value ~(* 20 hsize)}
-       {:name "dend_width" :value 60}]
+       {:name "dend_width" :value 50}]
       :padding 5
       :marks
       [
-       {:type :group                       ;Empty quadrant
+
+       ;; Upper-left Empty quadrant
+       {:type :group                       
         :style :cell
         :encode {:enter {:width {:signal "dend_width"}
                          :height {:signal "dend_width"}
-                         :strokeWidth {:value 0}
-                         }
-                 }
-        }
+                         :strokeWidth {:value 0}}}}
 
-       ;; V tree
+       ;; column tree
        ~(tree "utree" false)
 
-       ;; H tree
+       ;; row tree
        ~(tree "ltree" true)
 
-       ;; actual hmap 
+       ;; actual heatmapmap 
        {:type "group"
         :name "heatmap"
         :style "cell"
-        :encode {
-                 :update {
-                          :width {:signal "hm_width"}
-                          :height {:signal "hm_height"}
-                          }
-                 }
-
+        :encode {:update {:width {:signal "hm_width"}
+                          :height {:signal "hm_height"}}}
         :axes
-        [{:orient :right :scale :sy :title ~(wu/humanize h-field) } 
-         {:orient :bottom :scale :sx :labelAngle 90 :labelAlign "left" :labelOffset 5 :title ~(wu/humanize v-field)}]
+        [{:orient :right :scale :sy :domain false :title ~(wu/humanize h-field)} 
+         {:orient :bottom :scale :sx :labelAngle 90 :labelAlign "left" :labelBaseline :middle :domain false :title ~(wu/humanize v-field)}]
 
         :legends
         [{:fill :color
           :type :gradient
           :title ~(wu/humanize value-field)
           :titleOrient "bottom"
-          :gradientLength {:signal "hm_height"} ;TODO was /2 but in Wayne, looks better this way
+          :gradientLength {:signal "hm_height / 2"} ;TODO not always right
           }]
 
         :marks
@@ -132,7 +126,8 @@
             }}}
          ]
         }
-       ]}) )
+
+       ]}))
 
 ;;; This is the top-level call. Takes data and three field designators, does clustering on both dimensions
 ;;; and outputs a heatmap with dendrograms
@@ -144,7 +139,6 @@
   )
 
 
-
 #_
 (defn dendrogram-url
   [url row-field col-field value-field]
@@ -152,28 +146,4 @@
     (when data
       (dendrogram data row-field col-field value-field))))
 
-#_
-(defn dev-ui
-  []
-  [:div
-   ;; Clustering doesn't look very convincing!
-   ;; Also, needs to do an aggregation, outside of vega
-   ;; -url
-   ;; 
 
-   #_
-   (dendrogram movies
-               :distributor
-               :genre
-               :gross
-               
-               )
-
-      (dendrogram data2
-               :gene 
-               :sample
-               :value
-               
-               )
-
-   ])

@@ -12,3 +12,7 @@ pom.xml.asc
 .hgignore
 .hg/
 shadow-cljs.edn
+resources/public/cljs-out/
+node_modules/
+.shadow-cljs/
+
