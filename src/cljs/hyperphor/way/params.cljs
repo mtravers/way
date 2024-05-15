@@ -1,5 +1,6 @@
 (ns hyperphor.way.params
   (:require [re-frame.core :as rf]
+            [hyperphor.way.feeds :as f]
             [hyperphor.way.web-utils :as wu]
             ))
 
@@ -8,7 +9,7 @@
  :set-param
  (fn [db [_ data-id param value]]		
    (prn :set-param data-id param value)
-   (rf/dispatch [:fetch data-id])       ;timing issues?
+   (f/fetch data-id)
    (-> (if (vector? param)                  ;? smell
          (assoc-in db (concat [:params data-id] param) value)
          (assoc-in db [:params data-id param] value))

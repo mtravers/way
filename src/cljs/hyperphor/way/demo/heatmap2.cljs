@@ -1,6 +1,7 @@
 (ns hyperphor.way.demo.heatmap2
   (:require [hyperphor.way.cheatmap :as ch]
             [hyperphor.way.params :as p]
+            [hyperphor.way.feeds :as f]
             [hyperphor.way.web-utils :as wu]))
 
 ;;; Source "https://vega.github.io/editor/data/barley.json"
@@ -126,21 +127,35 @@
    {:yield 20.66667, :variety "Wisconsin No. 38", :year 1932, :site "Grand Rapids"}
    {:yield 29.33333, :variety "Wisconsin No. 38", :year 1932, :site "Duluth"}])
 
+;;; From vaguely
+(def datasets
+   ["https://vega.github.io/vega-lite/data/cars.json"
+    "https://vega.github.io/editor/data/barley.json"
+    #_ "https://vega.github.io/editor/data/anscombe.json"
+    "https://vega.github.io/editor/data/movies.json"])
+
 (defn field
   [label contents]
   [:tr [:th label] [:td contents]])
 
+(defmethod f/fetch :hm2
+  [_]
+  )
+
 (defn ui
   []
-  [:div
-   [ch/dendrogram data
-    ;; TODO keyword should not be necessary
-    ;; TODO be smarter about which fields are suitable for each (nominal vs. quantitative)
-    (keyword (p/param-value :hm2 :rows))
-    (keyword (p/param-value :hm2 :columns))
-    (keyword (p/param-value :hm2 :values))
-    ]
-   [:table
-    [field "Row" (p/select-widget-parameter :hm2 :rows (keys (first data)))]
-    [field "Column" (p/select-widget-parameter :hm2 :columns (keys (first data)))]
-    [field "Values" (p/select-widget-parameter :hm2 :values (keys (first data)))]]])
+  (let [data (f/from-url (p/param-value :hm2 :dataset))]
+    (prn :data (take 2 data))
+    [:div
+     [ch/dendrogram data
+      ;; TODO keyword should not be necessary
+      ;; TODO be smarter about which fields are suitable for each (nominal vs. quantitative)
+      (keyword (p/param-value :hm2 :rows))
+      (keyword (p/param-value :hm2 :columns))
+      (keyword (p/param-value :hm2 :values))
+      ]
+     [:table
+      [field "Dataset" (p/select-widget-parameter :hm2 :dataset datasets)]
+      [field "Row" (p/select-widget-parameter :hm2 :rows (keys (first data)))]
+      [field "Column" (p/select-widget-parameter :hm2 :columns (keys (first data)))]
+      [field "Values" (p/select-widget-parameter :hm2 :values (keys (first data)))]]]))
