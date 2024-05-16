@@ -127,12 +127,27 @@
    {:yield 20.66667, :variety "Wisconsin No. 38", :year 1932, :site "Grand Rapids"}
    {:yield 29.33333, :variety "Wisconsin No. 38", :year 1932, :site "Duluth"}])
 
-;;; From vaguely
+;;; TODO for demo purposes, would be good to include default field settings
 (def datasets
    ["https://vega.github.io/vega-lite/data/cars.json"
     "https://vega.github.io/editor/data/barley.json"
     #_ "https://vega.github.io/editor/data/anscombe.json"
-    "https://vega.github.io/editor/data/movies.json"])
+    "https://vega.github.io/editor/data/movies.json"
+    "https://vega.github.io/editor/data/gapminder.json"
+    "https://vega.github.io/editor/data/jobs.json"
+    "https://raw.githubusercontent.com/kjhealy/viz-organdata/master/organdonation.csv"
+
+    ;; This gets a lot of fields and keys misquoted. 
+    #_ "https://gist.githubusercontent.com/mtravers/ab8e57a71cd5e9f5766e1e66679451a3/raw/92da78c66d537ba66b020a41a158c61df458d469/boppop.csv"
+
+    ;; 
+    #_ "https://s3.amazonaws.com/files.explorer.devtechlab.com/us_foreign_aid_country.csv"
+
+    #_"https://vega.github.io/editor/data/us-employment.csv"
+
+    #_"https://vega.github.io/editor/data/londonBoroughs.json"
+    #_ "https://vega.github.io/editor/data/income.json"
+    #_ "https://vega.github.io/editor/data/football.json"])
 
 (defn field
   [label contents]
@@ -145,17 +160,16 @@
 (defn ui
   []
   (let [data (f/from-url (p/param-value :hm2 :dataset))]
-    (prn :data (take 2 data))
     [:div
+     [:table
+      [field "Dataset" (p/select-widget-parameter :hm2 :dataset datasets)]
+      [field "Row" (p/select-widget-parameter :hm2 :rows (keys (first data)))]
+      [field "Column" (p/select-widget-parameter :hm2 :columns (keys (first data)))]
+      [field "Values" (p/select-widget-parameter :hm2 :values (keys (first data)))]]
      [ch/dendrogram data
       ;; TODO keyword should not be necessary
       ;; TODO be smarter about which fields are suitable for each (nominal vs. quantitative)
       (keyword (p/param-value :hm2 :rows))
       (keyword (p/param-value :hm2 :columns))
       (keyword (p/param-value :hm2 :values))
-      ]
-     [:table
-      [field "Dataset" (p/select-widget-parameter :hm2 :dataset datasets)]
-      [field "Row" (p/select-widget-parameter :hm2 :rows (keys (first data)))]
-      [field "Column" (p/select-widget-parameter :hm2 :columns (keys (first data)))]
-      [field "Values" (p/select-widget-parameter :hm2 :values (keys (first data)))]]]))
+      ]]))

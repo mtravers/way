@@ -35,7 +35,7 @@
 (defn cluster
   [maps row-dim col-dim value-field]
   (let [indexed (u/map-values
-                 (comp u/coerce-numeric value-field)
+                 value-field                                ;TODO remoed a coerce which should be done elsewhere
                  (u/index-by (juxt row-dim col-dim) maps )) ;produces essentially a matrix, what clustring usually starts with
         rows (distinct (map row-dim maps))
         cols (distinct (map col-dim maps))
