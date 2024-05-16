@@ -37,9 +37,17 @@
                  [day8.re-frame/re-frame-10x "1.9.9"] ;TODO dev only
 
                  ]
+  :main ^:skip-aot hyperphor.way.demo.core
   :source-paths ["src/cljc" "src/clj" "src/cljs"] 
   :clean-targets [".shadow-cljs"]
   :repl-options {:init-ns hyperphor.way.demo.core}
+
+  :profiles {:uberjar {:aot :all
+                       :omit-source true
+                       :prep-tasks [["shadow" "release" "app"] "javac" "compile"] ;NOTE if you omit the javac compile items, :aot stops working!
+                       :resource-paths ["resources"]
+                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}}
+
   :shadow-cljs {:lein true
                 :builds
                 {:app {:target :browser

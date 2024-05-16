@@ -3,6 +3,7 @@
             [clojure.string :as s]
             [clojure.pprint :as pprint]
             [clojure.tools.logging :as log]
+            [clojure.java.io :as io]
             ))
 
 (defmethod aero/reader 'split
@@ -20,7 +21,7 @@
 (defn read-config
   [path]
   (log/info "Read config" path)
-  (set-config-map! (aero/read-config path)))
+  (set-config-map! (aero/read-config (io/resource path))))
 
 (defn config
   [& atts]
