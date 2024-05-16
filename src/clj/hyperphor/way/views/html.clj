@@ -1,5 +1,6 @@
 (ns hyperphor.way.views.html
   (:require [clojure.string :as str]
+            [hyperphor.way.config :as config]
             [environ.core :as env]
             )
   (:use [hiccup.core]))
@@ -93,7 +94,7 @@
   (html
    [:html
     [:head
-     [:title "TBD"]                   ;TODO
+     [:title (config/config :app-title)]
      [:meta {:charset "UTF-16"}]
      [:link {:href "https://fonts.googleapis.com/icon?family=Material+Icons"
              :rel "stylesheet"}]

@@ -21,8 +21,6 @@
   (:use [hiccup.core])
   )
 
-;;; TODO split into generic (way) part and app speecific
-
 ;;; TEMP obviously, to be replaced with actual authentication and user state
 (def basic-auth-creds  ["foo" "bar"])   ;;;; TODO get from env
 

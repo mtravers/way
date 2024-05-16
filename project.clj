@@ -4,39 +4,42 @@
   :license {:name "EPL-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :plugins [[lein-shadow "0.4.1"]]
-  :dependencies [[org.clojure/clojure "1.11.1"]
+  :dependencies [[org.clojure/clojure "1.11.3"]
                  [org.candelbio/multitool "0.1.5"]
                  [org.clojure/data.json "2.5.0"]
                  [environ "1.2.0"]
-                 [com.taoensso/timbre "6.3.1"]
+                 [com.taoensso/timbre "6.5.0"]
+                 [aero "1.1.6"]
 
                  ;; Backend
-                 [clj-http "3.12.3" :exclusions [commons-io]]
-                 [compojure "1.7.0"]
-                 [ring "1.11.0"]
-                 [ring/ring-core "1.11.0"]
-                 [ring/ring-defaults "0.4.0"]
-                 [ring/ring-jetty-adapter "1.11.0"]
+                 [clj-http "3.13.0" :exclusions [commons-io]]
+                 [compojure "1.7.1"]
+                 [ring "1.12.1"]
+                 [ring/ring-core "1.12.1"]
+                 [ring/ring-defaults "0.5.0"]
+                 [ring/ring-jetty-adapter "1.12.1"]
                  [ring-logger "1.1.1"]
                  [ring-middleware-format "0.7.5" :exclusions [javax.xml.bind/jaxb-api]]
+
                  ;; Data
-                 [clj-http "3.12.3" :exclusions [commons-io]]
+                 [clj-http "3.13.0" :exclusions [commons-io]]
+                 [org.clojure/data.csv "1.1.0"]
 
                  ;; frontend
                  ;; See packge.json for the real dependencies
                  #_ [org.clojure/clojurescript "1.11.132"] ;causes shadow-cljs error, who knows
                  [thheller/shadow-cljs "2.26.5"] ;TODO maybe only in dev profile
                  [reagent "1.2.0"]
-                 [re-frame "1.4.2"]
+                 [re-frame "1.4.3"]
                  [com.cemerick/url "0.1.1"]
-                 [cljs-ajax "0.8.0"]
+                 [cljs-ajax "0.8.4"]
                  [day8.re-frame/tracing "0.6.2"]      ;TODO dev only
-                 [day8.re-frame/re-frame-10x "1.9.3"] ;TODO dev only
+                 [day8.re-frame/re-frame-10x "1.9.9"] ;TODO dev only
 
                  ]
   :source-paths ["src/cljc" "src/clj" "src/cljs"] 
   :clean-targets [".shadow-cljs"]
-  :repl-options {:init-ns way.core}
+  :repl-options {:init-ns hyperphor.way.demo.core}
   :shadow-cljs {:lein true
                 :builds
                 {:app {:target :browser
