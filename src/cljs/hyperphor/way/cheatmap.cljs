@@ -129,14 +129,28 @@
 
        ]}))
 
+(defn aggregate
+  [data dim-cols agg-col agg-f]
+  (prn :aggregate (first data) dim-cols agg-col agg-f)
+  (->> data
+       (group-by (apply juxt dim-cols))
+       (map (fn [[dims rows]]
+              (assoc (zipmap dim-cols dims)
+                     agg-col
+                     (reduce agg-f (keep agg-col rows))
+                     )))
+       ))
+
 ;;; This is the top-level call. Takes data and three field designators, does clustering on both dimensions
 ;;; and outputs a heatmap with dendrograms
 (defn dendrogram
   [data row-field col-field value-field]
-  (let [cluster-l (cluster/cluster-data data row-field col-field value-field )
+  (when (and data row-field col-field value-field)
+  (let [data (aggregate data [row-field col-field] value-field +)
+        cluster-l (cluster/cluster-data data row-field col-field value-field )
         cluster-u (cluster/cluster-data data col-field row-field value-field )]
     [v/vega-view (spec data row-field col-field value-field cluster-l cluster-u) []])
-  )
+  ))
 
 
 #_
