@@ -2,7 +2,7 @@
   (:require [hyperphor.way.cheatmap :as ch]
             [hyperphor.way.params :as p]
             [hyperphor.way.feeds :as f]
-            [hyperphor.way.web-utils :as wu]))
+            ))
 
 ;;; Source "https://vega.github.io/editor/data/barley.json"
 (def data
@@ -127,27 +127,23 @@
    {:yield 20.66667, :variety "Wisconsin No. 38", :year 1932, :site "Grand Rapids"}
    {:yield 29.33333, :variety "Wisconsin No. 38", :year 1932, :site "Duluth"}])
 
-;;; TODO for demo purposes, would be good to include default field settings
+;;; for demo purposes
 (def datasets
-   ["https://vega.github.io/vega-lite/data/cars.json"
-    "https://vega.github.io/editor/data/barley.json"
-    #_ "https://vega.github.io/editor/data/anscombe.json"
-    "https://vega.github.io/editor/data/movies.json"
-    "https://vega.github.io/editor/data/gapminder.json"
-    "https://vega.github.io/editor/data/jobs.json"
-    "https://raw.githubusercontent.com/kjhealy/viz-organdata/master/organdonation.csv"
+  {"https://vega.github.io/vega-lite/data/cars.json" [:Origin :Year :Horsepower]
+   "https://vega.github.io/editor/data/barley.json" [:site :variety :yield]
+   "https://vega.github.io/editor/data/movies.json" [:Distributor (keyword "Major Genre") (keyword "US Gross")]
+   "https://vega.github.io/editor/data/gapminder.json" [:country :year :life_expect]
+   "https://vega.github.io/editor/data/jobs.json" [:job :sex :count]
+   "https://raw.githubusercontent.com/kjhealy/viz-organdata/master/organdonation.csv" [:country :year :donors]
+   })
 
-    ;; This gets a lot of fields and keys misquoted. 
-    #_ "https://gist.githubusercontent.com/mtravers/ab8e57a71cd5e9f5766e1e66679451a3/raw/92da78c66d537ba66b020a41a158c61df458d469/boppop.csv"
-
-    ;; 
-    #_ "https://s3.amazonaws.com/files.explorer.devtechlab.com/us_foreign_aid_country.csv"
-
-    #_"https://vega.github.io/editor/data/us-employment.csv"
-
-    #_"https://vega.github.io/editor/data/londonBoroughs.json"
-    #_ "https://vega.github.io/editor/data/income.json"
-    #_ "https://vega.github.io/editor/data/football.json"])
+(defn select-dataset
+  [ds-url]
+  (when-let [[rows cols values] (get datasets ds-url)]
+    ;; TODO name is because we aren't being consistent with use of keywords
+    (p/set-param-value :hm2 :rows (name rows))
+    (p/set-param-value :hm2 :columns (name cols))
+    (p/set-param-value :hm2 :values (name values))))
 
 (defn field
   [label contents]
@@ -157,12 +153,13 @@
   [_]
   )
 
+;;; TODO init
 (defn ui
   []
   (let [data (f/from-url (p/param-value :hm2 :dataset))]
     [:div
      [:table
-      [field "Dataset" (p/select-widget-parameter :hm2 :dataset datasets)]
+      [field "Dataset" (p/select-widget-parameter :hm2 :dataset (keys datasets) select-dataset)]
       [field "Row" (p/select-widget-parameter :hm2 :rows (keys (first data)))]
       [field "Column" (p/select-widget-parameter :hm2 :columns (keys (first data)))]
       [field "Values" (p/select-widget-parameter :hm2 :values (keys (first data)))]]

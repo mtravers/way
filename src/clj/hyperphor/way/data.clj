@@ -20,6 +20,18 @@
      ;; TODO default separator based on filename
      (csv/read-csv reader opts))))
 
+(defn read-csv-maps
+  [f]
+  (let [rows (read-csv-file f)]
+    (map #(zipmap (first rows) %)
+         (rest rows))))
+
+(defn read-tsv-maps
+  [f]
+  (let [rows (read-csv-file f :separator \tab)]
+    (map #(zipmap (first rows) %)
+         (rest rows))))
+
 (defn denil
   [thing]
   (if (nil? thing) [] thing))
@@ -48,11 +60,18 @@
                  (json/read-str :key-fn keyword)
                  coerce-numeric)
       "csv" (->> url
-                 ju/read-csv-maps       ;TODO wildly inefficient, rationalize all this
+                 read-csv-maps       ;TODO wildly inefficient, rationalize all this
                  (map u/dehumanize)
                  coerce-numeric
                  (map #(u/map-values nana %)) ;comparing NA and numbers breaks things
-                 ))))
+                 )
+      "tsv" (->> url
+                 read-tsv-maps       ;TODO wildly inefficient, rationalize all this
+                 (map u/dehumanize)
+                 coerce-numeric
+                 (map #(u/map-values nana %)) ;comparing NA and numbers breaks things
+                 )
+      )))
 
 (defn data
   [{:keys [data-id] :as params}]

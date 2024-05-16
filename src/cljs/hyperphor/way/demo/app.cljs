@@ -52,8 +52,8 @@
     :tab
     (array-map
      :home about
-     :heatmap hm/ui
-     :heatmap2 hm2/ui
+     :heatmap_basic hm/ui
+     :heatmap_flex hm2/ui
      )]
    #_ [footer]
    ])

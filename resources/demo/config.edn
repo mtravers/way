@@ -1,3 +1,4 @@
 {:app-title "Way demo with Clustered Heatmaps"
+ :colophon  ["Copyright © " [:a {:href "http://hyperphor.com" :style "color: white;"} "Hyperphor"] " 2020-2024"] ;TODO
  ;; TODO auth parameters
  }

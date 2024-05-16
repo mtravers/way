@@ -46,12 +46,13 @@
 (defn select-widget-parameter
   [data-id param-id values & [extra-action]]
   ;; TODO Something wrong, smelly about this. And doesn't always work
+  #_  ;; wrong for here and maybe for everything
   (when (not (empty? values))
     ;; -if removal seems to fix things? This is wrong and breaks updates
     (rf/dispatch [:set-param-if data-id param-id (safe-name (first values))])) ;TODO smell? But need to initialize somewhere
   (wu/select-widget
    param-id
-   @(rf/subscribe [:param  data-id param-id])
+   @(rf/subscribe [:param data-id param-id])
      #(do
         (rf/dispatch [:set-param data-id param-id %])
         (when extra-action (extra-action %) )) ;ugn
@@ -65,3 +66,7 @@
 (defn param-value
   [data-id param-id]
   @(rf/subscribe [:param data-id param-id]))
+
+(defn set-param-value
+  [data-id param-id value]
+  (rf/dispatch [:set-param data-id param-id value]))
