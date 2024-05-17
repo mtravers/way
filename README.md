@@ -4,6 +4,8 @@ The way that can be named is not the eternal way. – Lao Tzu
 
 A base for building data-oriented websites it Clojure, ClojureScript, and Vega.
 
+[Demo site](https://shrouded-escarpment-03060-744eda4cc53f.herokuapp.com/)
+
 
 ## Features
 
@@ -29,7 +31,7 @@ The code to generate clustered heatmaps is actually pretty simple, and lives in 
 - [Vega specification generator](src/cljs/hyperphor/way/cheatmap.cljs)
 - [Clustering](src/cljc/hyperphor/way/cluster.cljc)
 
-A [a simple example](src/cljs/hyperphor/way/demo/heatmap.cljs#L167) of use.
+A [simple example](src/cljs/hyperphor/way/demo/heatmap.cljs#L167) of use.
 
 
 ## License
