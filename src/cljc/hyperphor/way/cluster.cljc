@@ -1,27 +1,19 @@
 (ns hyperphor.way.cluster
-  (:require [org.candelbio.multitool.core :as u]
-            ))
+  (:require [org.candelbio.multitool.core :as u]))
 
 ;;; https://bioinformatics.ccr.cancer.gov/docs/btep-coding-club/CC2023/complex_heatmap_enhanced_volcano/
 ;;; https://en.wikipedia.org/wiki/Ward%27s_method
 
-(defn square [x] (* x x))
-
+;;; Not presently used
 (defn manhattan-distance
   [v1 v2]
   (reduce + (map (comp abs -) v1 v2)))
 
-;;; Not used
-(defn euclidean-distance
-  [v1 v2]
-  (Math/sqrt (reduce + (map (comp square -) v1 v2))))
-
 (defn euclidean-squared-distance
   [v1 v2]
-  (reduce + (map (comp square -) v1 v2)))
+  (reduce + (map (fn [e1 e2] (Math/pow (- e1 e2) 2)) v1 v2)))
 
 (def vector-mean (u/vectorize (fn [a b] (/ (+ a b) 2))))
-
   
 ;;; Naive and inefficient algo
 ;;; maps: data as seq of maps
@@ -35,20 +27,20 @@
 (defn cluster
   [maps row-dim col-dim value-field]
   (let [indexed (u/map-values
-                 value-field                                ;TODO remoed a coerce which should be done elsewhere
-                 (u/index-by (juxt row-dim col-dim) maps )) ;produces essentially a matrix, what clustring usually starts with
+                 value-field
+                 (u/index-by (juxt row-dim col-dim) maps )) ;produces essentially a matrix, what clustering usually starts with
         rows (distinct (map row-dim maps))
         cols (distinct (map col-dim maps))
         vectors (zipmap rows (map (fn [row]
-                                   (vec (map (fn [col]
-                                               (get indexed [row col]))
-                                             cols)))
-                                 rows))
+                                    (vec (map (fn [col]
+                                                (get indexed [row col]))
+                                              cols)))
+                                  rows))
         ;; Initialize to the complete graph of inter-row distances
         distances (into {}
                         (u/forf [row1 rows row2 rows]
-                          (when (u/<* row1 row2)
-                            [[row1 row2] (euclidean-squared-distance (get vectors row1) (get vectors row2))])))
+                                (when (u/<* row1 row2)
+                                  [[row1 row2] (euclidean-squared-distance (get vectors row1) (get vectors row2))])))
         ]
     (loop [vectors vectors              ;TODO make transient, but some issues
            distances distances

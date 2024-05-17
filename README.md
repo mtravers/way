@@ -16,7 +16,7 @@ A base for building data-oriented websites it Clojure, ClojureScript, and Vega.
 
 ## Clustered Heatmaps
 
-[!](doc/assets/heatmap.png)
+![Heatmap](doc/assets/heatmap.png)
 
 Clustered heatmaps are a powerful data visualization technique that combines the functionalities of heatmaps and hierarchical clustering. A heatmap uses color to represent the values in a data matrix, allowing for an immediate visual assessment of patterns and trends. Each cell in the matrix is colored according to its value, making it easy to spot anomalies and relationships within the data. 
 
@@ -26,7 +26,7 @@ When these two techniques are combined, the rows and columns of the heatmap are 
 
 The code to generate clustered heatmaps is actually pretty simple, and lives in two files:
 
-- [Vega specification generator](src/cljs/hyperphor/way/)
+- [Vega specification generator](src/cljs/hyperphor/way/cheatmap.cljs)
 - [Clustering](src/cljc/hyperphor/way/cluster.cljc)
 
 A [a simple example](src/cljs/hyperphor/way/demo/heatmap.cljs#L167) of use.
