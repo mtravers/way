@@ -153,13 +153,14 @@
   [_]
   )
 
-;;; TODO init
+;;; TODO changing ds or mappings can be slow, should have a spinner (not that clear how to do that)
 (defn ui
   []
   (let [data (f/from-url (p/param-value :hm2 :dataset))]
     [:div
+     [:div.alert.alert-info "Select a dataset, then you can play around with the field mappings"]
      [:table
-      [field "Dataset" (p/select-widget-parameter :hm2 :dataset (keys datasets) select-dataset)]
+      [field "Dataset" (p/select-widget-parameter :hm2 :dataset (cons nil (keys datasets)) select-dataset)]
       [field "Row" (p/select-widget-parameter :hm2 :rows (keys (first data)))]
       [field "Column" (p/select-widget-parameter :hm2 :columns (keys (first data)))]
       [field "Values" (p/select-widget-parameter :hm2 :values (keys (first data)))]]

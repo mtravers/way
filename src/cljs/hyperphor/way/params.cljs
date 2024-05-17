@@ -53,12 +53,12 @@
   (wu/select-widget
    param-id
    @(rf/subscribe [:param data-id param-id])
-     #(do
-        (rf/dispatch [:set-param data-id param-id %])
-        (when extra-action (extra-action %) )) ;ugn
+   #(do
+      (rf/dispatch [:set-param data-id param-id %])
+      (when extra-action (extra-action %) )) ;ugn
    (map (fn [v]
           {:value v :label (if v (wu/humanize v)  "---")})
-         values)
+        values)
    nil
    nil
    {:display "inherit" :width "inherit" :margin-left "2px"}))
