@@ -61,7 +61,6 @@
 (rf/reg-event-db
  :data-error
  (fn [db [_ data-id message]]
-   ;; TODO temp, for debugging and old times sake
    (rf/dispatch [:flash (if message
                         {:class "alert-danger" :message message}
                         {:show? false})])

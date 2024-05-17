@@ -13,7 +13,7 @@
   (when data
     [vega-lite-adapter {:data (clj->js data)
                         :spec (clj->js spec)
-                        :actions true}])) ;TODO on in dev mode
+                        :actions true}])) ;TODO dev mode and/or config
 
 (def vega-adapter (reagent/adapt-react-class rv/Vega))
 
@@ -22,8 +22,6 @@
   (when data
     [vega-adapter {:data (clj->js data)
                    :spec (clj->js spec)
-                   ;; TODO need to generalize this
-                   :signalListeners (clj->js {"click" (fn [_ v] (rf/dispatch [:vega-click v]))}) 
                    :actions true
                    }]))
 

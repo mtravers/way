@@ -14,7 +14,7 @@
   "Define a set of tabs. id is a keyword, tabs is a map (array-map is best to preserve order) mapping keywords to ui fns "
   [id tabs]
   (let [active (or @(rf/subscribe [:active-tab id])
-                    (ffirst tabs))]      ;Default to first tab TODO should do via dab
+                    (ffirst tabs))]      ;Default to first tab 
     [:div
      [:ul.nav.nav-tabs
       (for [[name view] tabs]

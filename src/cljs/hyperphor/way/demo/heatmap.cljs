@@ -171,7 +171,7 @@
 
    [:div.row
     [:div.col-4
-     [ch/dendrogram data2 :gene :sample :value]]
+     [ch/heatmap data2 :gene :sample :value]]
     [:div.col-8
      [:img {:src "https://bioinformatics.ccr.cancer.gov/docs/btep-coding-club/CC2023/complex_heatmap_enhanced_volcano_files/figure-html/unnamed-chunk-6-1.png"
             :height 500}]]]])

@@ -143,7 +143,8 @@
 
 ;;; This is the top-level call. Takes data and three field designators, does clustering on both dimensions
 ;;; and outputs a heatmap with dendrograms
-(defn dendrogram
+;;; TODO allow selection of aggregation fn (+, mean, count...)
+(defn heatmap
   [data row-field col-field value-field]
   (when (and data row-field col-field value-field)
   (let [data (aggregate data [row-field col-field] value-field +)
@@ -154,7 +155,7 @@
 
 
 #_
-(defn dendrogram-url
+(defn heatmap-url
   [url row-field col-field value-field]
   (let [data @(rf/subscribe [:data [:url {:url url}]])]
     (when data
