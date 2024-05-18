@@ -33,6 +33,12 @@ The code to generate clustered heatmaps is actually pretty simple, and lives in 
 
 A [simple example](src/cljs/hyperphor/way/demo/heatmap.cljs#L167) of use.
 
+## Development
+
+To run locally
+
+    lein shadow compile app
+    lein run <port>
 
 ## License
 

@@ -13,121 +13,125 @@
   [cluster-data left?]
   (let [width-signal (if left? "dend_width" "hm_width")
         height-signal (if left? "hm_height" "dend_width")]
-    `{:type "group"
-      :style "cell"
-      :data 
-      [{:name "links"
-        :source ~cluster-data
-        :transform
-        [{:type "treelinks"}
-         {:type "linkpath"
-          :orient ~(if left? "horizontal" "vertical")
-          :shape "orthogonal"}]}]
-      :encoding {:width {:signal ~width-signal} 
-                 :height {:signal ~height-signal}
-                 :strokeWidth {:value 0}}
-      :marks [{:type "path"
-               :from {:data "links"}
-               :encode {:enter
-                        {:path {:field "path"}
-                         :stroke {:value "#666"}}}}]
-      }))
+    {:type "group"
+     :style "cell"
+     :data 
+     [{:name "links"
+       :source cluster-data
+       :transform
+       [{:type "treelinks"}
+        {:type "linkpath"
+         :orient (if left? "horizontal" "vertical")
+         :shape "orthogonal"}]}]
+     :encoding {:width {:signal width-signal} 
+                :height {:signal height-signal}
+                :strokeWidth {:value 0}}
+     :marks [{:type "path"
+              :from {:data "links"}
+              :encode {:enter
+                       {:path {:field "path"}
+                        :stroke {:value "#666"}}}}]
+     }))
 
 ;;; Generates TWO data specs (for full tree, and filtered to leaves)
 (defn tree-data-spec
   [name clusters left?]
-  `[{:name ~name
-     :values ~clusters
-     :transform
-     [{:type "stratify" :key "id" :parentKey "parent"}
-      {:type "tree"
-       :method "cluster"
-       :size [{:signal ~(if left? "hm_height" "hm_width")} ;;  
-              {:signal "dend_width"}]
-       :as ~(if left?
-              ["y" "x" "depth" "children"]
-              ["x" "y" "depth" "children"])}]}
-    {:name ~(str name "-leaf")
-     :source ~name
-     :transform [{:type "filter" :expr "datum.children == 0"}]}]
+  [{:name name
+    :values clusters
+    :transform
+    [{:type "stratify" :key "id" :parentKey "parent"}
+     {:type "tree"
+      :method "cluster"
+      :size [{:signal (if left? "hm_height" "hm_width")} ;;  
+             {:signal "dend_width"}]
+      :as (if left?
+            ["y" "x" "depth" "children"]
+            ["x" "y" "depth" "children"])}]}
+   {:name (str name "-leaf")
+    :source name
+    :transform [{:type "filter" :expr "datum.children == 0"}]}]
   )
 
+;;; TODO → Multitool
+(defn concatv
+  "Conj a value to the front (left) of vector. Not performant"
+  [& args]
+  (vec (apply concat args)))
 
 (defn spec
   [data h-field v-field value-field h-clusters v-clusters]
   (let [hsize (count (distinct (map h-field data))) ;wanted to this in vega but circularities are interfering
         vsize (count (distinct (map v-field data)))]
-    `{:description "A clustered heatmap with side-dendrograms"
-      :$schema "https://vega.github.io/schema/vega/v5.json"
-      :layout {:align "each"
-               :columns 2}
-      :data [{:name "hm"
-              :values ~data}
-             ~@(tree-data-spec "ltree" h-clusters true)
-             ~@(tree-data-spec "utree" v-clusters false)
-             ]
-      :scales
-      ;; Note: min is because sorting apparently requires an aggregation? And there's no pickone
-      [{:name "sx" :type "band" :domain  {:data "utree-leaf" :field "id" :sort {:field "x" :op "min"}} :range {:step 20} } 
-       {:name "sy" :type "band" :domain  {:data "ltree-leaf" :field "id" :sort {:field "y" :op "min"}} :range {:step 20}} 
-       {:name "color"
-        :type "linear"
-        :range {:scheme "BlueOrange"}
-        :domain {:data "hm" :field ~value-field}
-        }]
-      :signals
-      [{:name "hm_width" :value ~(* 20 vsize)}
-       {:name "hm_height" :value ~(* 20 hsize)}
-       {:name "dend_width" :value 50}]
-      :padding 5
-      :marks
-      [
+    {:description "A clustered heatmap with side-dendrograms"
+     :$schema "https://vega.github.io/schema/vega/v5.json"
+     :layout {:align "each"
+              :columns 2}
+     :data (concatv
+            [{:name "hm"
+              :values data}]
+            (tree-data-spec "ltree" h-clusters true)
+            (tree-data-spec "utree" v-clusters false))
+     :scales
+     ;; Note: min is because sorting apparently requires an aggregation? And there's no pickone
+     [{:name "sx" :type "band" :domain  {:data "utree-leaf" :field "id" :sort {:field "x" :op "min"}} :range {:step 20} } 
+      {:name "sy" :type "band" :domain  {:data "ltree-leaf" :field "id" :sort {:field "y" :op "min"}} :range {:step 20}} 
+      {:name "color"
+       :type "linear"
+       :range {:scheme "BlueOrange"}
+       :domain {:data "hm" :field value-field}
+       }]
+     :signals
+     [{:name "hm_width" :value (* 20 vsize)}
+      {:name "hm_height" :value (* 20 hsize)}
+      {:name "dend_width" :value 50}]
+     :padding 5
+     :marks
+     [
 
-       ;; Upper-left Empty quadrant
-       {:type :group                       
-        :style :cell
-        :encode {:enter {:width {:signal "dend_width"}
-                         :height {:signal "dend_width"}
-                         :strokeWidth {:value 0}}}}
+      ;; Upper-left Empty quadrant
+      {:type :group                       
+       :style :cell
+       :encode {:enter {:width {:signal "dend_width"}
+                        :height {:signal "dend_width"}
+                        :strokeWidth {:value 0}}}}
 
-       ;; column tree
-       ~(tree "utree" false)
+      ;; column tree
+      (tree "utree" false)
 
-       ;; row tree
-       ~(tree "ltree" true)
+      ;; row tree
+      (tree "ltree" true)
 
-       ;; actual heatmapmap 
-       {:type "group"
-        :name "heatmap"
-        :style "cell"
-        :encode {:update {:width {:signal "hm_width"}
-                          :height {:signal "hm_height"}}}
-        :axes
-        [{:orient :right :scale :sy :domain false :title ~(wu/humanize h-field)} 
-         {:orient :bottom :scale :sx :labelAngle 90 :labelAlign "left" :labelBaseline :middle :domain false :title ~(wu/humanize v-field)}]
+      ;; actual heatmapmap 
+      {:type "group"
+       :name "heatmap"
+       :style "cell"
+       :encode {:update {:width {:signal "hm_width"}
+                         :height {:signal "hm_height"}}}
+       :axes
+       [{:orient :right :scale :sy :domain false :title (wu/humanize h-field)} 
+        {:orient :bottom :scale :sx :labelAngle 90 :labelAlign "left" :labelBaseline :middle :domain false :title (wu/humanize v-field)}]
 
-        :legends
-        [{:fill :color
-          :type :gradient
-          :title ~(wu/humanize value-field)
-          :titleOrient "bottom"
-          :gradientLength {:signal "hm_height / 2"} ;TODO not always right
-          }]
+       :legends
+       [{:fill :color
+         :type :gradient
+         :title (wu/humanize value-field)
+         :titleOrient "bottom"
+         :gradientLength {:signal "hm_height / 2"} ;TODO not always right
+         }]
 
-        :marks
-        [{:type "rect"
-          :from {:data "hm"}
-          :encode
-          {:enter
-           {:y {:field ~h-field :scale "sy"}
-            :x {:field ~v-field :scale "sx"}
-            :width {:value 19} :height {:value 19}
-            :fill {:field ~value-field :scale "color"}
-            }}}
-         ]
-        }
-
-       ]}))
+       :marks
+       [{:type "rect"
+         :from {:data "hm"}
+         :encode
+         {:enter
+          {:y {:field h-field :scale "sy"}
+           :x {:field v-field :scale "sx"}
+           :width {:value 19} :height {:value 19}
+           :fill {:field value-field :scale "color"}
+           }}}
+        ]
+       }
+      ]}))
 
 (defn aggregate
   [data dim-cols agg-col agg-f]
@@ -147,18 +151,10 @@
 (defn heatmap
   [data row-field col-field value-field]
   (when (and data row-field col-field value-field)
-  (let [data (aggregate data [row-field col-field] value-field +)
-        cluster-l (cluster/cluster-data data row-field col-field value-field )
-        cluster-u (cluster/cluster-data data col-field row-field value-field )]
-    [v/vega-view (spec data row-field col-field value-field cluster-l cluster-u) []])
-  ))
-
-
-#_
-(defn heatmap-url
-  [url row-field col-field value-field]
-  (let [data @(rf/subscribe [:data [:url {:url url}]])]
-    (when data
-      (dendrogram data row-field col-field value-field))))
+    (let [data (aggregate data [row-field col-field] value-field +)
+          cluster-l (cluster/cluster-data data row-field col-field value-field )
+          cluster-u (cluster/cluster-data data col-field row-field value-field )]
+      [v/vega-view (spec data row-field col-field value-field cluster-l cluster-u) []])
+    ))
 
 
