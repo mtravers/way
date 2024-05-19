@@ -69,12 +69,16 @@
   (rf/dispatch [:set-param data-id param-id value]))
 
 (defn checkbox-parameter
-  [data-id param-id & [extra-action]]
-  [:input.form-check-input
-   {:name param-id
-    :type "checkbox"
-    :checked @(rf/subscribe [:param data-id param-id])
-    :on-change (fn [e]
-                 (rf/dispatch
-                  [:set-param data-id param-id (-> e .-target .-checked)]))}
-   ])
+  [data-id param-id & {:keys [extra-action label]}]
+  [:div.form-check
+   [:input.form-check-input
+    {:name param-id
+     :id param-id
+     :type "checkbox"
+     :checked @(rf/subscribe [:param data-id param-id])
+     :on-change (fn [e]
+                  (rf/dispatch
+                   [:set-param data-id param-id (-> e .-target .-checked)]))}
+    ]
+   (when label
+     [:label.form-check-label {:for param-id} label])])

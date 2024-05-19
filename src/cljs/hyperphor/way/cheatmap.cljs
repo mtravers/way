@@ -12,27 +12,25 @@
 ;;; Generates the spec for a single tree 
 (defn tree
   [cluster-data left?]
-  (let [width-signal (if left? "dend_width" "hm_width")
-        height-signal (if left? "hm_height" "dend_width")]
-    {:type "group"
-     :style "cell"
-     :data 
-     [{:name "links"
-       :source cluster-data
-       :transform
-       [{:type "treelinks"}
-        {:type "linkpath"
-         :orient (if left? "horizontal" "vertical")
-         :shape "orthogonal"}]}]
-     :encoding {:width {:signal width-signal} 
-                :height {:signal height-signal}
-                :strokeWidth {:value 0}}
-     :marks [{:type "path"
-              :from {:data "links"}
-              :encode {:enter
-                       {:path {:field "path"}
-                        :stroke {:value "#666"}}}}]
-     }))
+  {:type "group"
+   :style "cell"
+   :data 
+   [{:name "links"
+     :source cluster-data
+     :transform
+     [{:type "treelinks"}
+      {:type "linkpath"
+       :orient (if left? "horizontal" "vertical")
+       :shape "orthogonal"}]}]
+   :encoding {:width {:signal (if left? "dend_width" "hm_width")} 
+              :height {:signal (if left? "hm_height" "dend_width")}
+              :strokeWidth {:value 0}}
+   :marks [{:type "path"
+            :from {:data "links"}
+            :encode {:enter
+                     {:path {:field "path"}
+                      :stroke {:value "#666"}}}}]
+   })
 
 ;;; Generates TWO data specs (for full tree, and filtered to leaves)
 (defn tree-data-spec
@@ -70,12 +68,21 @@
      :data (concatv
             [{:name "hm"
               :values data}]
-            (tree-data-spec "ltree" h-clusters true)
-            (tree-data-spec "utree" v-clusters false))
+            (when h-clusters (tree-data-spec "htree" h-clusters true))
+            (when v-clusters (tree-data-spec "vtree" v-clusters false)))
      :scales
      ;; Note: min is because sorting apparently requires an aggregation? And there's no pickone
-     [{:name "sx" :type "band" :domain  {:data "utree-leaf" :field "id" :sort {:field "x" :op "min"}} :range {:step 20} } 
-      {:name "sy" :type "band" :domain  {:data "ltree-leaf" :field "id" :sort {:field "y" :op "min"}} :range {:step 20}} 
+     [{:name "sx" :type "band"
+       :domain (if v-clusters
+                 {:data "vtree-leaf" :field "id" :sort {:field "x" :op "min"}}
+                 {:data "hm" :field v-field :sort true})
+       :range {:step 20} } 
+      {:name "sy" :type "band"
+       :domain (if h-clusters
+                 {:data "htree-leaf" :field "id" :sort {:field "y" :op "min"}}
+                 {:data "hm" :field h-field :sort true}
+                 )
+       :range {:step 20}} 
       {:name "color"
        :type "linear"
        :range {:scheme "BlueOrange"}
@@ -88,19 +95,32 @@
      :padding 5
      :marks
      [
-
       ;; Upper-left Empty quadrant
       {:type :group                       
        :style :cell
-       :encode {:enter {:width {:signal "dend_width"}
-                        :height {:signal "dend_width"}
+       :encode {:enter {:width (if h-clusters {:signal "dend_width"} {:value 0})
+                        :height (if v-clusters {:signal "dend_width"} {:value 0})
                         :strokeWidth {:value 0}}}}
 
       ;; column tree
-      (tree "utree" false)
+      (if v-clusters
+        (tree "vtree" false)
+        {:type "group"
+         :style "cell"
+         :encoding {:width {:signal "hm_width"} 
+                    :height {:value 0}
+                    :strokeWidth {:value 0}}
+         })
 
       ;; row tree
-      (tree "ltree" true)
+      (if h-clusters
+        (tree "htree" true)
+        {:type "group"
+         :style "cell"
+         :encoding {:width {:value 0}
+                    :height {:signal "hm_height"} 
+                    :strokeWidth {:value 0}}
+         })
 
       ;; actual heatmapmap 
       {:type "group"
@@ -156,8 +176,10 @@
   [data row-field col-field value-field & {:keys [aggregate-fn cluster-rows? cluster-cols?] :or {aggregate-fn :sum}}]
   (when (and data row-field col-field value-field)
     (let [data (aggregate data [row-field col-field] value-field aggregate-fn)
-          cluster-l (cluster/cluster-data data row-field col-field value-field )
-          cluster-u (cluster/cluster-data data col-field row-field value-field )]
+          cluster-l (when cluster-rows?
+                      (cluster/cluster-data data row-field col-field value-field ))
+          cluster-u (when cluster-cols?
+                      (cluster/cluster-data data col-field row-field value-field ))]
       [v/vega-view (spec data row-field col-field value-field cluster-l cluster-u) []])
     ))
 
