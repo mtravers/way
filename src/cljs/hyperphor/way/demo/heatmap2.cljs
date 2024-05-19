@@ -4,15 +4,15 @@
             [hyperphor.way.feeds :as f]
             ))
 
-;;; TODO load up clustering and aggregate options
 (def datasets
-  {"https://vega.github.io/vega-lite/data/cars.json"
-   [:Origin :Year :Horsepower {:cluster-cols? false :aggregate :mean}]
+  {
    "https://vega.github.io/editor/data/barley.json"
    [:site :variety :yield { :aggregate :mean}]
    "https://vega.github.io/editor/data/movies.json" [:Distributor (keyword "Major Genre") (keyword "US Gross")]
    "https://vega.github.io/editor/data/gapminder.json"
    [:year :country :fertility {:cluster-rows? false}]
+   "https://vega.github.io/vega-lite/data/cars.json"
+   [:Origin :Year :Horsepower {:cluster-cols? false :aggregate :mean}]
    "https://vega.github.io/editor/data/jobs.json"
    [:job :sex :count {:cluster-cols? false :aggregate :mean}]
    "https://raw.githubusercontent.com/kjhealy/viz-organdata/master/organdonation.csv"

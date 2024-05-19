@@ -7,7 +7,12 @@
   )
 
 ;;; TODO row/col annotations w colors and scales, see examples
-;;; TODO more parameterization incl option to have tree on right side
+;;; TODO autoscale dend "height" so it remains legible for large graphs
+;;; TODO more parameterization
+;;;   option to have tree on right side
+;;;   color map
+;;;   sizes
+
 
 ;;; Generates the spec for a single tree 
 (defn tree
@@ -40,6 +45,7 @@
     :transform
     [{:type "stratify" :key "id" :parentKey "parent"}
      {:type "tree"
+      :separation false                 ;necessary to keep tree and hm aligned
       :method "cluster"
       :size [{:signal (if left? "hm_height" "hm_width")} ;;  
              {:signal "dend_width"}]
@@ -51,7 +57,7 @@
     :transform [{:type "filter" :expr "datum.children == 0"}]}]
   )
 
-;;; TODO → Multitool
+;;; TODO in Multitool
 (defn concatv
   "Conj a value to the front (left) of vector. Not performant"
   [& args]
@@ -173,7 +179,7 @@
 ;;; This is the top-level call. Takes data and three field designators, does clustering on both dimensions
 ;;; and outputs a heatmap with dendrograms
 (defn heatmap
-  [data row-field col-field value-field & {:keys [aggregate-fn cluster-rows? cluster-cols?]}]
+  [data row-field col-field value-field & {:keys [aggregate-fn cluster-rows? cluster-cols?] :or {cluster-rows? true cluster-cols? true}}]
   (when (and data row-field col-field value-field)
     (let [data (aggregate data [row-field col-field] value-field (or aggregate-fn :sum))
           cluster-l (when cluster-rows?
