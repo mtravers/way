@@ -173,9 +173,9 @@
 ;;; This is the top-level call. Takes data and three field designators, does clustering on both dimensions
 ;;; and outputs a heatmap with dendrograms
 (defn heatmap
-  [data row-field col-field value-field & {:keys [aggregate-fn cluster-rows? cluster-cols?] :or {aggregate-fn :sum}}]
+  [data row-field col-field value-field & {:keys [aggregate-fn cluster-rows? cluster-cols?]}]
   (when (and data row-field col-field value-field)
-    (let [data (aggregate data [row-field col-field] value-field aggregate-fn)
+    (let [data (aggregate data [row-field col-field] value-field (or aggregate-fn :sum))
           cluster-l (when cluster-rows?
                       (cluster/cluster-data data row-field col-field value-field ))
           cluster-u (when cluster-cols?
