@@ -23,30 +23,35 @@
     (p/set-param-value :hm2 :values (name values))))
 
 (defn field
-  [label contents]
-  [:tr [:th label] [:td contents]])
+  [label contents extra]
+  [:tr [:th label] [:td contents] [:td extra]])
 
 (defmethod f/fetch :hm2
   [_]
   )
 
+(defn aggregation-selector
+  []
+  (p/select-widget-parameter :hm2 :aggregate [:sum :mean :count]))
+
 ;;; TODO changing ds or mappings can be slow, should have a spinner (not that clear how to do that)
-;;; TODO allow selection of aggregation fn (+, mean, count...)
 (defn ui
   []
   (let [data (f/from-url (p/param-value :hm2 :dataset))]
     [:div
      [:div.alert.alert-info "Select a dataset, then you can play around with the field mappings"]
-     [:table
+     [:table.table.table-sm {:style {:width "400px"}}
+      [:tbody
       #_ [field "URL" [:span [:input] [:button {:type :button} "Load"]]] ;TODO not yet
       [field "Dataset" (p/select-widget-parameter :hm2 :dataset (cons nil (keys datasets)) select-dataset)]
-      [field "Row" (p/select-widget-parameter :hm2 :rows (keys (first data)))]
-      [field "Column" (p/select-widget-parameter :hm2 :columns (keys (first data)))]
-      [field "Values" (p/select-widget-parameter :hm2 :values (keys (first data)))]]
+      [field "Row" (p/select-widget-parameter :hm2 :rows (keys (first data))) (p/checkbox-parameter :hm2 :cluster-rows)]
+      [field "Column" (p/select-widget-parameter :hm2 :columns (keys (first data))) (p/checkbox-parameter :hm2 :cluster-cols)]
+      [field "Values" (p/select-widget-parameter :hm2 :values (keys (first data))) [aggregation-selector]]]]
      [ch/heatmap data
       ;; TODO keyword should not be necessary
       ;; TODO be smarter about which fields are suitable for each (nominal vs. quantitative)
       (keyword (p/param-value :hm2 :rows))
       (keyword (p/param-value :hm2 :columns))
       (keyword (p/param-value :hm2 :values))
+      :aggregate-fn (keyword (p/param-value :hm2 :aggregate))
       ]]))
