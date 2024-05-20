@@ -18,7 +18,6 @@
 (defn tree
   [cluster-data left?]
   {:type "group"
-   :style "cell"
    :data 
    [{:name "links"
      :source cluster-data
@@ -27,9 +26,6 @@
       {:type "linkpath"
        :orient (if left? "horizontal" "vertical")
        :shape "orthogonal"}]}]
-   :encoding {:width {:signal (if left? "dend_width" "hm_width")} 
-              :height {:signal (if left? "hm_height" "dend_width")}
-              :strokeWidth {:value 0}}
    :marks [{:type "path"
             :from {:data "links"}
             :encode {:enter
@@ -103,7 +99,6 @@
      [
       ;; Upper-left Empty quadrant
       {:type :group                       
-       :style :cell
        :encode {:enter {:width (if h-clusters {:signal "dend_width"} {:value 0})
                         :height (if v-clusters {:signal "dend_width"} {:value 0})
                         :strokeWidth {:value 0}}}}
@@ -112,7 +107,6 @@
       (if v-clusters
         (tree "vtree" false)
         {:type "group"
-         :style "cell"
          :encoding {:width {:signal "hm_width"} 
                     :height {:value 0}
                     :strokeWidth {:value 0}}
@@ -122,7 +116,6 @@
       (if h-clusters
         (tree "htree" true)
         {:type "group"
-         :style "cell"
          :encoding {:width {:value 0}
                     :height {:signal "hm_height"} 
                     :strokeWidth {:value 0}}
