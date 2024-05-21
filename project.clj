@@ -1,4 +1,4 @@
-(defproject way "0.1.0-SNAPSHOT"
+(defproject hyperphor/way "0.1.0-SNAPSHOT"
   :description "Way"
   :url "http://example.com/TODO"
   :license {:name "EPL-2.0"

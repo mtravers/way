@@ -4,6 +4,9 @@
 ;;; https://bioinformatics.ccr.cancer.gov/docs/btep-coding-club/CC2023/complex_heatmap_enhanced_volcano/
 ;;; https://en.wikipedia.org/wiki/Ward%27s_method
 
+;;; TODO package in a Vega transform, see https://vega.github.io/vega/docs/api/extensibility/#transform
+
+
 ;;; Not presently used
 (defn manhattan-distance
   [v1 v2]

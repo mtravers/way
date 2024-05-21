@@ -1,4 +1,4 @@
-(ns way.aggrid
+(ns hyperphor.way.aggrid
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]
             ["ag-grid-community" :as ag]
