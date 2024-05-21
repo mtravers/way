@@ -53,6 +53,7 @@
    #(do
       (rf/dispatch [:set-param data-id param-id %])
       (when extra-action (extra-action %) )) ;ugn
+   ;; TODO this breaks :optgroups
    (map (fn [v]
           {:value v :label (if v (wu/humanize v)  "---")})
         values)

@@ -2,6 +2,7 @@
   (:require [hyperphor.way.cheatmap :as ch]
             [hyperphor.way.params :as p]
             [hyperphor.way.feeds :as f]
+            [hyperphor.way.vega :as v]
             ))
 
 (def datasets
@@ -59,6 +60,10 @@
   []
   [:span "Aggregate by" (p/select-widget-parameter :hm2 :aggregate [:sum :mean :count])])
 
+(defn color-scheme-selector
+  []
+  [:span "Color scheme" (p/select-widget-parameter :hm2 :color-scheme v/color-schemes)])
+
 ;;; TODO changing ds or mappings can be slow, should have a spinner (not that clear how to do that)
 (defn ui
   []
@@ -73,7 +78,9 @@
        [field "Column" (p/select-widget-parameter :hm2 :columns (keys (first data))) (p/checkbox-parameter :hm2 :cluster-cols? :label "cluster?")]
        [field "Values"
         (p/select-widget-parameter :hm2 :values (keys (first data)))
-        [aggregation-selector]]]]
+        [:span
+         [aggregation-selector]
+         [color-scheme-selector]]]]]
      [ch/heatmap data
       ;; TODO keyword should not be necessary
       ;; TODO be smarter about which fields are suitable for each (nominal vs. quantitative)
@@ -83,4 +90,5 @@
       :aggregate-fn (keyword (p/param-value :hm2 :aggregate))
       :cluster-rows? (p/param-value :hm2 :cluster-rows?)
       :cluster-cols? (p/param-value :hm2 :cluster-cols?)
+      :color-scheme (p/param-value :hm2 :color-scheme)
       ]]))

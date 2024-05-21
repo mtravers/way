@@ -25,5 +25,64 @@
                    :actions true
                    }]))
 
+;;; TODO put these in groups, but :optgroups ar broken
+(def color-schemes
+  [
+   "blues"
+   "tealblues"
+   "teals"
+   "greens"
+   "browns"
+   "greys"
+   "purples"
+   "warmgreys"
+   "reds"
+   "oranges"
+
+   "turbo"
+   "viridis"
+   "inferno"
+   "magma"
+   "plasma"
+   "cividis"
+   "bluegreen"
+   "bluepurple"
+   "goldgreen"
+   "goldorange"
+   "goldred"
+   "greenblue"
+   "orangered"
+   "purplebluegreen"
+   "purpleblue"
+   "purplered"
+   "redpurple"
+   "yellowgreenblue"
+   "yellowgreen"
+   "yelloworangebrown"
+   "yelloworangered"
+   "darkblue"
+   "darkgold"
+   "darkgreen"
+   "darkmulti"
+   "darkred"
+   "lightgreyred"
+   "lightgreyteal"
+   "lightmulti"
+   "lightorange"
+   "lighttealblue"
+
+   ;; diverging
+   "blueorange"
+   "brownbluegreen"
+   "purplegreen"
+   "pinkyellowgreen"
+   "purpleorange"
+   "redblue"
+   "redgrey"
+   "redyellowblue"
+   "redyellowgreen"
+   "spectral"])
+
+
 
 

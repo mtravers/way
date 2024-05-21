@@ -60,7 +60,7 @@
   (vec (apply concat args)))
 
 (defn spec
-  [data h-field v-field value-field h-clusters v-clusters]
+  [data h-field v-field value-field h-clusters v-clusters {:keys [color-scheme] :as options}]
   (let [hsize (count (distinct (map h-field data))) ;wanted to this in vega but circularities are interfering
         vsize (count (distinct (map v-field data)))]
     {:description "A clustered heatmap with side-dendrograms"
@@ -87,7 +87,7 @@
        :range {:step 20}} 
       {:name "color"
        :type "linear"
-       :range {:scheme "BlueOrange"}
+       :range {:scheme color-scheme}
        :domain {:data "hm" :field value-field}
        }]
      :signals
@@ -169,17 +169,24 @@
                        )))
          )))
 
+(def default-options
+  {:color-scheme "magma"})
+
 ;;; This is the top-level call. Takes data and three field designators, does clustering on both dimensions
 ;;; and outputs a heatmap with dendrograms
 (defn heatmap
-  [data row-field col-field value-field & {:keys [aggregate-fn cluster-rows? cluster-cols?] :or {cluster-rows? true cluster-cols? true}}]
+  [data row-field col-field value-field
+   & {:keys [aggregate-fn cluster-rows? cluster-cols? color-scheme]
+      :or {cluster-rows? true cluster-cols? true}
+      :as options}]
   (when (and data row-field col-field value-field)
     (let [data (aggregate data [row-field col-field] value-field (or aggregate-fn :sum))
+          options (merge default-options options)
           cluster-l (when cluster-rows?
                       (cluster/cluster-data data row-field col-field value-field ))
           cluster-u (when cluster-cols?
                       (cluster/cluster-data data col-field row-field value-field ))]
-      [v/vega-view (spec data row-field col-field value-field cluster-l cluster-u) []])
+      [v/vega-view (spec data row-field col-field value-field cluster-l cluster-u options) []])
     ))
 
 
