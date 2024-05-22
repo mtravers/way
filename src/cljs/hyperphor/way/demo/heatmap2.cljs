@@ -6,12 +6,11 @@
             ))
 
 (def datasets
-  {
+  {"https://vega.github.io/editor/data/gapminder.json"
+   [:year :country :fertility {:cluster-rows? false}]
    "https://vega.github.io/editor/data/barley.json"
    [:site :variety :yield { :aggregate :mean}]
    "https://vega.github.io/editor/data/movies.json" [:Distributor (keyword "Major Genre") (keyword "US Gross")]
-   "https://vega.github.io/editor/data/gapminder.json"
-   [:year :country :fertility {:cluster-rows? false}]
    "https://vega.github.io/vega-lite/data/cars.json"
    [:Origin :Year :Horsepower {:cluster-cols? false :aggregate :mean}]
    "https://vega.github.io/editor/data/jobs.json"
@@ -62,18 +61,29 @@
 
 (defn color-scheme-selector
   []
-  [:span "Color scheme" (p/select-widget-parameter :hm2 :color-scheme v/color-schemes)])
+  [:span
+   "Color scheme"
+   (p/select-widget-parameter :hm2 :color-scheme v/color-schemes :default "redyellowblue")
+   [:a {:href "https://vega.github.io/vega/docs/schemes/#greys" :target "_blank"} "ref"]])
+
+;;; TODO propagate this pattern to other event handlers?
+;;; Also note, it isn't really "after"
+(defmulti set-param-after (fn [db [_ data-id param value]] [data-id param]))
+
+(defmethod p/set-param-after [:hm2 :dataset]
+  [db [_ data-id param value]]
+  (select-dataset value)
+  db)
 
 ;;; TODO changing ds or mappings can be slow, should have a spinner (not that clear how to do that)
 (defn ui
   []
   (let [data (f/from-url (p/param-value :hm2 :dataset))]
     [:div
-     [:div.alert.alert-info "Select a dataset, then you can play around with the field mappings"]
      [:table.table.table-sm {:style {:width "400px"}}
       [:tbody
        #_ [field "URL" [:span [:input] [:button {:type :button} "Load"]]] ;TODO not yet
-       [field2 "Dataset" (p/select-widget-parameter :hm2 :dataset (cons nil (keys datasets)) select-dataset)]
+       [field2 "Dataset" (p/select-widget-parameter :hm2 :dataset (keys datasets) :default (first (keys datasets)))]
        [field "Row" (p/select-widget-parameter :hm2 :rows (keys (first data))) (p/checkbox-parameter :hm2 :cluster-rows? :label "cluster?")]
        [field "Column" (p/select-widget-parameter :hm2 :columns (keys (first data))) (p/checkbox-parameter :hm2 :cluster-cols? :label "cluster?")]
        [field "Values"
