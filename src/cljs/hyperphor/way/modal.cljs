@@ -69,9 +69,17 @@
        [modal-panel @modal])]))
 
 
-
-
-
-
-
-
+;;; Still ahs ops stuff, but should have something conveniet
+#_
+(defn expose-modal
+  [op]
+  (rf/dispatch [:modal {:show? true
+                        :title (or (:label op) (:id op))
+                        :contents contents
+                        :ok-handler (fn [] (rf/dispatch [:do-op op]))
+                        :ok-enabled? (fn [] true)
+                        :ok-text (cond (:sheet-producer op) "Create sheet" ;TODO ops should be able to specify
+                                       :else "Add column")
+                        }
+                (:params op)
+                ]))

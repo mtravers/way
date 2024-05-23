@@ -3,8 +3,24 @@
 }
 
 /*****************/
+/* parameters and forms (mostly TODO)
+/*****************/
+
+.parameter {
+  padding-left: 10px;
+  padding-right: 10px;
+  white-space: nowrap !important; /* boostrap .text-nowrap */
+}
+
+.plabel {
+  padding-right: 5px;
+  font-weight: bold;
+}
+
+/*****************/
 /* modal popovers*/
 /*****************/
+
 .modal-header {
     background-color: #a7a8aa;
     color: white;

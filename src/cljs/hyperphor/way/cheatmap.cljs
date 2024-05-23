@@ -10,9 +10,14 @@
 ;;; TODO autoscale dend "height" so it remains legible for large graphs
 ;;; TODO more parameterization
 ;;;   option to have tree on right side
-;;;   color map
-;;;   sizes
+;;;   axis labels
 
+(def default-options
+  {:color-scheme "magma"
+   :dend-width 50                       ;TODO should be independent for x and y, also would be niec to be adaptive to hmap size
+   :cell-size 22                        ;TODO x and y independence
+   :cell-gap 1
+   })
 
 ;;; Generates the spec for a single tree 
 (defn tree
@@ -30,7 +35,17 @@
             :from {:data "links"}
             :encode {:enter
                      {:path {:field "path"}
-                      :stroke {:value "#666"}}}}]
+                      :stroke {:value "#666"}}}}
+           ;; For debugging purposes
+           #_
+           {:type "text"
+            :from {:data cluster-data}
+            :encode {:enter
+                     {:x {:field "x"}
+                      :y {:field "y"}
+                      :angle {:value 45}
+                      :text {:field "id"}}}}
+           ]
    })
 
 ;;; Generates TWO data specs (for full tree, and filtered to leaves)
@@ -60,7 +75,8 @@
   (vec (apply concat args)))
 
 (defn spec
-  [data h-field v-field value-field h-clusters v-clusters {:keys [color-scheme] :as options}]
+  [data h-field v-field value-field h-clusters v-clusters
+   {:keys [color-scheme dend-width cell-size cell-gap] :as options}]
   (let [hsize (count (distinct (map h-field data))) ;wanted to this in vega but circularities are interfering
         vsize (count (distinct (map v-field data)))]
     {:description "A clustered heatmap with side-dendrograms"
@@ -78,22 +94,23 @@
        :domain (if v-clusters
                  {:data "vtree-leaf" :field "id" :sort {:field "x" :op "min"}}
                  {:data "hm" :field v-field :sort true})
-       :range {:step 20} } 
+       :range {:step cell-size} } 
       {:name "sy" :type "band"
        :domain (if h-clusters
                  {:data "htree-leaf" :field "id" :sort {:field "y" :op "min"}}
                  {:data "hm" :field h-field :sort true}
                  )
-       :range {:step 20}} 
+       :range {:step cell-size}} 
       {:name "color"
        :type "linear"
        :range {:scheme color-scheme}
        :domain {:data "hm" :field value-field}
        }]
      :signals
-     [{:name "hm_width" :value (* 20 vsize)}
-      {:name "hm_height" :value (* 20 hsize)}
-      {:name "dend_width" :value 50}]
+     [{:name "hm_width" :value (* cell-size vsize)}
+      {:name "hm_height" :value (* cell-size hsize)}
+      {:name "dend_width" :value dend-width} ;TODO :bind doesn't work, maybe these shouldn't be signals
+      ]
      :padding 5
      :marks
      [
@@ -126,7 +143,8 @@
        :name "heatmap"
        :style "cell"
        :encode {:update {:width {:signal "hm_width"}
-                         :height {:signal "hm_height"}}}
+                         :height {:signal "hm_height"}
+                         :fill {:value "#ccc"}}} ;TODO parameter, also see cell-gap
        :axes
        [{:orient :right :scale :sy :domain false :title (wu/humanize h-field)} 
         {:orient :bottom :scale :sx :labelAngle 90 :labelAlign "left" :labelBaseline :middle :domain false :title (wu/humanize v-field)}]
@@ -146,7 +164,7 @@
          {:enter
           {:y {:field h-field :scale "sy"}
            :x {:field v-field :scale "sx"}
-           :width {:value 19} :height {:value 19}
+           :width {:value (- cell-size cell-gap)} :height {:value (- cell-size cell-gap)}
            :fill {:field value-field :scale "color"}
            }}}
         ]
@@ -169,8 +187,6 @@
                        )))
          )))
 
-(def default-options
-  {:color-scheme "magma"})
 
 ;;; This is the top-level call. Takes data and three field designators, does clustering on both dimensions
 ;;; and outputs a heatmap with dendrograms

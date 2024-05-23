@@ -5,6 +5,7 @@
             [hyperphor.way.vega :as v]
             ))
 
+;;; TODO a lot of these aren't really great examples of clustering, find some better ones
 (def datasets
   {"https://vega.github.io/editor/data/gapminder.json"
    [:year :country :fertility {:cluster-rows? false}]
@@ -57,14 +58,16 @@
 
 (defn aggregation-selector
   []
-  [:span "Aggregate by" (p/select-widget-parameter :hm2 :aggregate [:sum :mean :count])])
+  [:span.parameter                      ;TODO parameter fns should include this I think (except sometimes you want table layout, argh)
+   [:span.plabel "Aggregate by"]
+   (p/select-widget-parameter :hm2 :aggregate [:sum :mean :count])])
 
 (defn color-scheme-selector
   []
-  [:span
-   "Color scheme"
+  [:span.parameter
+   [:span.plabel "Color scheme"]
    (p/select-widget-parameter :hm2 :color-scheme v/color-schemes :default "redyellowblue")
-   [:a {:href "https://vega.github.io/vega/docs/schemes/#greys" :target "_blank"} "ref"]])
+   [:a.px-2 {:href "https://vega.github.io/vega/docs/schemes/#greys" :target "_blank"} "ref"]])
 
 ;;; TODO propagate this pattern to other event handlers?
 ;;; Also note, it isn't really "after"
@@ -80,7 +83,7 @@
   []
   (let [data (f/from-url (p/param-value :hm2 :dataset))]
     [:div
-     [:table.table.table-sm {:style {:width "400px"}}
+     [:table.table.table {:style {:width "400px"}}
       [:tbody
        #_ [field "URL" [:span [:input] [:button {:type :button} "Load"]]] ;TODO not yet
        [field2 "Dataset" (p/select-widget-parameter :hm2 :dataset (keys datasets) :default (first (keys datasets)))]
@@ -101,4 +104,5 @@
       :cluster-rows? (p/param-value :hm2 :cluster-rows?)
       :cluster-cols? (p/param-value :hm2 :cluster-cols?)
       :color-scheme (p/param-value :hm2 :color-scheme)
+      ;; TODO have a contol for this:cell-gap 0
       ]]))
