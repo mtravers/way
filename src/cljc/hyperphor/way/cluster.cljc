@@ -7,7 +7,7 @@
 ;;; TODO package in a Vega transform, see https://vega.github.io/vega/docs/api/extensibility/#transform
 
 
-;;; Not presently used
+;;; Not presently used, TODO should be an option, it actually seems better in some cases
 (defn manhattan-distance
   [v1 v2]
   (reduce + (map (comp abs -) v1 v2)))

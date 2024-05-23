@@ -76,7 +76,8 @@
 
 (defn checkbox-parameter
   [data-id param-id & {:keys [label]}]
-  [:div.form-check
+  [:span.parameter
+   [:span.plabel label]
    [:input.form-check-input
     {:name param-id
      :id param-id
@@ -85,6 +86,5 @@
      :on-change (fn [e]
                   (rf/dispatch
                    [:set-param data-id param-id (-> e .-target .-checked)]))}
-    ]
-   (when label
-     [:label.form-check-label {:for param-id} label])])
+    ]])
+

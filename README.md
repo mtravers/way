@@ -35,8 +35,17 @@ A [simple example](src/cljs/hyperphor/way/demo/heatmap.cljs#L167) of use.
 
 ## Development
 
-To run locally
+To run locally:
 
+### Install
+
+- Java
+- NodeJS
+- Leiningen
+    
+### Run
+
+    npm install
     lein shadow compile app
     lein run <port>
 

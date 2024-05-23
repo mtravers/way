@@ -54,6 +54,7 @@
 (defn url-data
   [{:keys [url]}]
   (let [ext (file-ext url)]
+    ;; TODO refactor
     (case ext
       "json" (-> url
                  slurp
@@ -71,7 +72,9 @@
                  coerce-numeric
                  (map #(u/map-values nana %)) ;comparing NA and numbers breaks things
                  )
-      )))
+      )
+    ))
+
 
 (defn data
   [{:keys [data-id] :as params}]
@@ -80,6 +83,7 @@
         ;; methodize
         ;; For debugging
         "url" (url-data params)
+        (throw (ex-info "Bad data request" {:params params}))
         )
       denil))                           ;TODO temp because nil is being used to mean no value on front-end...lazy
 

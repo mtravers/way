@@ -10,6 +10,7 @@
    [hyperphor.way.web-utils :as wu]
    [hyperphor.way.demo.heatmap :as hm]
    [hyperphor.way.demo.heatmap2 :as hm2]
+   [hyperphor.way.demo.forms :as forms]
    [org.candelbio.multitool.core :as u]
    [org.candelbio.multitool.browser :as browser]
    )) 
@@ -81,6 +82,7 @@
      :home about
      :heatmap_basic hm/ui
      :heatmap_flex hm2/ui
+     ;; :form_test forms/ui
      )]
    #_ [footer]
    ])
