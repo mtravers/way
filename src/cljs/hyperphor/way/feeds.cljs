@@ -86,20 +86,22 @@
        (:invalid nil) (do (rf/dispatch [:fetch data-id])
                           data)))))
 
-(defmulti loaded (fn [id data db] id))
+;;; Was loaded, but that had bad def and I think not actually used.
+(defmulti postload (fn [db id data] id))
 
-(defmethod loaded :default
-  [id data db]
-  #_ (prn "no loaded for" id)) 
+(defmethod postload :default
+  [db id data]
+  db)
 
 (rf/reg-event-db
  ::loaded
  (fn [db [_ data-id data]]
-   (loaded data-id data db)             ;mm
    (-> db
        (assoc-in [:data data-id] data)
        (assoc-in [:data-status data-id] :valid) ;not necessarily, UI could have changed while we were loading!
-       (assoc :loading? false))))
+       (assoc :loading? false)
+       (postload data-id data)
+       )))
  
 
 (defn from-url
