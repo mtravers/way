@@ -23,6 +23,11 @@
    ;; 4M rows, too big to handle
    #_ "https://media.githubusercontent.com/media/ahmedmoustafa/gene-expression-datasets/main/datasets/medulloblastoma/medulloblastoma.long.tsv"
    #_[:gene :sample :expression]
+
+   ;; Single-colummn, special case of clustering (TODO make this a test)
+   #_ "http://localhost:2219/data/barley-small.json"
+   #_ [:site :variety :yield { :aggregate :mean}]
+
    })
 
 

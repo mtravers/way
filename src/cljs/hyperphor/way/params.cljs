@@ -15,7 +15,7 @@
 (defn set-param
   [db [_ data-id param value :as msg]]
   (prn :set-param data-id param value)
-  (f/fetch data-id)                   
+  (f/fetch data-id)                     ;TODO more sophisticated mechanism
   (set-param-after db msg)
   (-> (if (vector? param)                  ;? smell
         (assoc-in db (concat [:params data-id] param) value)

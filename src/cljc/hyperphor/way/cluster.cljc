@@ -73,8 +73,10 @@
   (let [clusters (cluster maps row-dim col-dim value-field)
         invert (merge (u/index-by second clusters) (u/index-by #(nth % 2)  clusters))
         root (last clusters)]
-    (cons {:id (first root)}
-          (map (fn [[c [p _]]]
-                 {:id c :parent p})
-               invert))))
+    (if (empty? clusters)               ;special case where there is a single row
+      {:id (get (first maps) row-dim)}
+      (cons {:id (first root)}
+            (map (fn [[c [p _]]]
+                   {:id c :parent p})
+                 invert)))))
 
