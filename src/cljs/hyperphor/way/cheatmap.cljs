@@ -18,6 +18,7 @@
    :dend-width 50                       ;TODO should be independent for x and y, also would be niec to be adaptive to hmap size
    :cell-size 22                        ;TODO x and y independence
    :cell-gap 1
+   :aggregate-fn :mean
    })
 
 ;;; Generates the spec for a single tree 
@@ -197,8 +198,8 @@
       :or {cluster-rows? true cluster-cols? true}
       :as options}]
   (when (and data row-field col-field value-field)
-    (let [data (aggregate data [row-field col-field] value-field (or aggregate-fn :sum))
-          options (merge default-options options)
+    (let [options (merge default-options options)
+          data (aggregate data [row-field col-field] value-field aggregate-fn)
           cluster-l (when cluster-rows?
                       (cluster/cluster-data data row-field col-field value-field ))
           cluster-u (when cluster-cols?

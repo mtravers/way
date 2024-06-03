@@ -1,10 +1,14 @@
 (ns hyperphor.way.cluster
   (:require [org.candelbio.multitool.core :as u]))
 
+;;; Not particularly performant, but OK for the sizes of heatmaps that you can reasonably display.
+;;; See ANN (approximate nearest neighbor search) https://github.com/jbellis/jvector?tab=readme-ov-file
+
 ;;; https://bioinformatics.ccr.cancer.gov/docs/btep-coding-club/CC2023/complex_heatmap_enhanced_volcano/
 ;;; https://en.wikipedia.org/wiki/Ward%27s_method
 
 ;;; TODO package in a Vega transform, see https://vega.github.io/vega/docs/api/extensibility/#transform
+
 
 
 ;;; Not presently used, TODO should be an option, it actually seems better in some cases

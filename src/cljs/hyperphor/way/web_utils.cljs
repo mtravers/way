@@ -53,7 +53,7 @@
 
 (def none-value "--none--")             ;Need a non-nil value to mean none.
 
-(defn- select-widget-options
+(defn select-widget-options
   [options prompt]
   (let [options (if prompt
                   (cons {:value none-value :label (str "<" prompt ">")}

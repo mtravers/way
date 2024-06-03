@@ -3,12 +3,15 @@
             [hyperphor.way.params :as p]
             [hyperphor.way.feeds :as f]
             [hyperphor.way.vega :as v]
+            [hyperphor.way.web-utils :as wu]
             ))
 
 ;;; TODO a lot of these aren't really great examples of clustering, find some better ones
 (def datasets
-  {"https://vega.github.io/editor/data/gapminder.json"
+  (array-map                            ;preserve order
+   "https://vega.github.io/editor/data/gapminder.json"
    [:year :country :fertility {:cluster-rows? false}]
+
    "https://vega.github.io/editor/data/barley.json"
    [:site :variety :yield { :aggregate :mean}]
    "https://vega.github.io/editor/data/movies.json" [:Distributor (keyword "Major Genre") (keyword "US Gross")]
@@ -16,8 +19,16 @@
    [:Origin :Year :Horsepower {:cluster-cols? false :aggregate :mean}]
    "https://vega.github.io/editor/data/jobs.json"
    [:job :sex :count {:cluster-cols? false :aggregate :mean}]
+
+   ;; Eh, and date is mis-sorted (needs to be declared temporal maybe)
+   #_ "https://vega.github.io/editor/data/stocks.csv"
+   #_ [:date :symbol :price {}]
+
    "https://raw.githubusercontent.com/kjhealy/viz-organdata/master/organdonation.csv"
    [:country :year :donors {:cluster-cols? false}]
+   "https://raw.githubusercontent.com/zief0002/modeling/main/data/fertility.csv"
+   [:region :gni_class :fertility_rate {}]
+
    "https://www.cdc.gov/niosh/data/datasets/rd-1064-2023-0/files/Liver-gene-expression.csv"
    [:gene :treatment :fold_change]
    ;; 4M rows, too big to handle
@@ -27,12 +38,13 @@
    ;; Single-colummn, special case of clustering (TODO make this a test)
    #_ "http://localhost:2219/data/barley-small.json"
    #_ [:site :variety :yield { :aggregate :mean}]
-
-   })
+   "https://gist.githubusercontent.com/armgilles/194bcff35001e7eb53a2a8b441e8b2c6/raw/92200bc0a673d5ce2110aaad4544ed6c4010f687/pokemon.csv"
+   [:type_1 :generation :speed]
+   ))
 
 
 (def default-options
-  {:aggregate :sum
+  {:aggregate :mean
    :cluster-rows? true
    :cluster-cols? true})
 
@@ -95,7 +107,10 @@
     [:div
      [:table.table.table {:style {:width "400px"}}
       [:tbody
-       #_ [field "URL" [:span [:input] [:button {:type :button} "Load"]]] ;TODO not yet
+       ;; Doesn't work at all
+       #_ [field2 "Dataset" (p/combo-widget-parameter :hm2 :dataset (keys datasets))]
+       ;; Better but still issues (like, not having good field settings for a random data url breaks)
+       #_ [field2 "URL" (p/text-parameter :hm2 :dataset)]
        [field2 "Dataset" (p/select-widget-parameter :hm2 :dataset (keys datasets) :default (first (keys datasets)))]
        [field "Row" (p/select-widget-parameter :hm2 :rows (keys (first data))) (p/checkbox-parameter :hm2 :cluster-rows? :label "cluster?")]
        [field "Column" (p/select-widget-parameter :hm2 :columns (keys (first data))) (p/checkbox-parameter :hm2 :cluster-cols? :label "cluster?")]
