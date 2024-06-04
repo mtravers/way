@@ -1,6 +1,7 @@
 (ns hyperphor.way.cheatmap
   (:require [hyperphor.way.vega :as v]
             [hyperphor.way.cluster :as cluster]
+            [org.candelbio.multitool.core :as u]
             [org.candelbio.multitool.math :as um]
             [hyperphor.way.web-utils :as wu]
             )
@@ -168,7 +169,9 @@
            :x {:field v-field :scale "sx"}
            :width {:value (- cell-size cell-gap)} :height {:value (- cell-size cell-gap)}
            :fill {:field value-field :scale "color"}
-           }}}
+           :tooltip {:signal (u/expand-template "datum.{h-field} + ', ' + datum.{v-field} + ', ' + datum.{value-field}"
+                                                {:h-field (name h-field) :v-field (name v-field) :value-field (name value-field)}
+                                                :key-fn keyword)}}}}
         ]
        }
       ]}))
