@@ -5,7 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :plugins [[lein-shadow "0.4.1"]]
   :dependencies [[org.clojure/clojure "1.11.3"]
-                 [org.candelbio/multitool "0.1.5"]
+                 [org.candelbio/multitool "0.1.6"]
                  [org.clojure/data.json "2.5.0"]
                  [environ "1.2.0"]
                  [com.taoensso/timbre "6.5.0"]

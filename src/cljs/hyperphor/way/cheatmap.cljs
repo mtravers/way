@@ -20,6 +20,7 @@
    :cell-size 22                        ;TODO x and y independence
    :cell-gap 1
    :aggregate-fn :mean
+   :tooltip? true
    })
 
 ;;; Generates the spec for a single tree 
@@ -79,7 +80,7 @@
 
 (defn spec
   [data h-field v-field value-field h-clusters v-clusters
-   {:keys [color-scheme dend-width cell-size cell-gap] :as options}]
+   {:keys [color-scheme dend-width cell-size cell-gap tooltip?] :as options}]
   (let [hsize (count (distinct (map h-field data))) ;wanted to this in vega but circularities are interfering
         vsize (count (distinct (map v-field data)))]
     {:description "A clustered heatmap with side-dendrograms"
@@ -169,9 +170,11 @@
            :x {:field v-field :scale "sx"}
            :width {:value (- cell-size cell-gap)} :height {:value (- cell-size cell-gap)}
            :fill {:field value-field :scale "color"}
-           :tooltip {:signal (u/expand-template "datum.{h-field} + ', ' + datum.{v-field} + ', ' + datum.{value-field}"
-                                                {:h-field (name h-field) :v-field (name v-field) :value-field (name value-field)}
-                                                :key-fn keyword)}}}}
+           :tooltip {:signal (when tooltip?
+                               (u/expand-template
+                                "{ '{h-field}': datum.{h-field}, '{v-field}': datum.{v-field}, '{value-field}': datum.{value-field}}"
+                                {:h-field (name h-field) :v-field (name v-field) :value-field (name value-field)}
+                                :key-fn keyword))}}}}
         ]
        }
       ]}))
