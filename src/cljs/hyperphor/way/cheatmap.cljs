@@ -4,6 +4,7 @@
             [org.candelbio.multitool.core :as u]
             [org.candelbio.multitool.math :as um]
             [hyperphor.way.web-utils :as wu]
+            [clojure.walk :as walk]
             )
   )
 
@@ -78,106 +79,132 @@
   [& args]
   (vec (apply concat args)))
 
+
+(defn- patch-matches?
+  [id thing]
+  (and (map? thing)
+       (every? (fn [[k v]] (= v (k thing))) id)))
+
+;;; Terrible kludge but the alternative is exposing every single Vega option explicitly?
+;;; Each patch is [<identifier> <modifier]
+;;; identifier is a map, matches maps that have equal fields
+;;; modifier is a map to be merged (recursively) with original
+;;; → multitool I guess,
+;;; Extension: check that each patch matches exactly once.
+(defn patch
+  [spec patches]
+  (reduce (fn [spec [id mods]]
+            (walk/postwalk
+             #(if (patch-matches? id %)
+                (u/merge-recursive % mods)
+                %)
+             spec))
+          spec
+          patches))
+
 (defn spec
   [data h-field v-field value-field h-clusters v-clusters
-   {:keys [color-scheme dend-width cell-size cell-gap tooltip?] :as options}]
+   {:keys [color-scheme dend-width cell-size cell-gap tooltip? patches] :as options}]
   (let [hsize (count (distinct (map h-field data))) ;wanted to this in vega but circularities are interfering
-        vsize (count (distinct (map v-field data)))]
-    {:description "A clustered heatmap with side-dendrograms"
-     :$schema "https://vega.github.io/schema/vega/v5.json"
-     :layout {:align "each"
-              :columns 2}
-     :data (concatv
-            [{:name "hm"
-              :values data}]
-            (when h-clusters (tree-data-spec "htree" h-clusters true))
-            (when v-clusters (tree-data-spec "vtree" v-clusters false)))
-     :scales
-     ;; Note: min is because sorting apparently requires an aggregation? And there's no pickone
-     [{:name "sx" :type "band"
-       :domain (if v-clusters
-                 {:data "vtree-leaf" :field "id" :sort {:field "x" :op "min"}}
-                 {:data "hm" :field v-field :sort true})
-       :range {:step cell-size} } 
-      {:name "sy" :type "band"
-       :domain (if h-clusters
-                 {:data "htree-leaf" :field "id" :sort {:field "y" :op "min"}}
-                 {:data "hm" :field h-field :sort true}
-                 )
-       :range {:step cell-size}} 
-      {:name "color"
-       :type "linear"
-       :range {:scheme color-scheme}
-       :domain {:data "hm" :field value-field}
-       }]
-     :signals
-     [{:name "hm_width" :value (* cell-size vsize)}
-      {:name "hm_height" :value (* cell-size hsize)}
-      {:name "dend_width" :value dend-width} ;TODO :bind doesn't work, maybe these shouldn't be signals
-      ]
-     :padding 5
-     :marks
-     [
-      ;; Upper-left Empty quadrant
-      {:type :group                       
-       :encode {:enter {:width (if h-clusters {:signal "dend_width"} {:value 0})
-                        :height (if v-clusters {:signal "dend_width"} {:value 0})
-                        :strokeWidth {:value 0}}}}
+        vsize (count (distinct (map v-field data)))
+        base 
+        {:description "A clustered heatmap with side-dendrograms"
+         :$schema "https://vega.github.io/schema/vega/v5.json"
+         :layout {:align "each"
+                  :columns 2}
+         :data (concatv
+                [{:name "hm"
+                  :values data}]
+                (when h-clusters (tree-data-spec "htree" h-clusters true))
+                (when v-clusters (tree-data-spec "vtree" v-clusters false)))
+         :scales
+         ;; Note: min is because sorting apparently requires an aggregation? And there's no pickone
+         [{:name "sx" :type "band"
+           :domain (if v-clusters
+                     {:data "vtree-leaf" :field "id" :sort {:field "x" :op "min"}}
+                     {:data "hm" :field v-field :sort true})
+           :range {:step cell-size} } 
+          {:name "sy" :type "band"
+           :domain (if h-clusters
+                     {:data "htree-leaf" :field "id" :sort {:field "y" :op "min"}}
+                     {:data "hm" :field h-field :sort true}
+                     )
+           :range {:step cell-size}} 
+          {:name "color"
+           :type "linear"
+           :range {:scheme color-scheme}
+           :domain {:data "hm" :field value-field}
+           }]
+         :signals
+         [{:name "hm_width" :value (* cell-size vsize)}
+          {:name "hm_height" :value (* cell-size hsize)}
+          {:name "dend_width" :value dend-width} ;TODO :bind doesn't work, maybe these shouldn't be signals
+          ]
+         :padding 5
+         :marks
+         [
+          ;; Upper-left Empty quadrant
+          {:type :group                       
+           :encode {:enter {:width (if h-clusters {:signal "dend_width"} {:value 0})
+                            :height (if v-clusters {:signal "dend_width"} {:value 0})
+                            :strokeWidth {:value 0}}}}
 
-      ;; column tree
-      (if v-clusters
-        (tree "vtree" false)
-        {:type "group"
-         :encoding {:width {:signal "hm_width"} 
-                    :height {:value 0}
-                    :strokeWidth {:value 0}}
-         })
+          ;; column tree
+          (if v-clusters
+            (tree "vtree" false)
+            {:type "group"
+             :encoding {:width {:signal "hm_width"} 
+                        :height {:value 0}
+                        :strokeWidth {:value 0}}
+             })
 
-      ;; row tree
-      (if h-clusters
-        (tree "htree" true)
-        {:type "group"
-         :encoding {:width {:value 0}
-                    :height {:signal "hm_height"} 
-                    :strokeWidth {:value 0}}
-         })
+          ;; row tree
+          (if h-clusters
+            (tree "htree" true)
+            {:type "group"
+             :encoding {:width {:value 0}
+                        :height {:signal "hm_height"} 
+                        :strokeWidth {:value 0}}
+             })
 
-      ;; actual heatmapmap 
-      {:type "group"
-       :name "heatmap"
-       :style "cell"
-       :encode {:update {:width {:signal "hm_width"}
-                         :height {:signal "hm_height"}
-                         :fill {:value "#ccc"}}} ;TODO parameter, also see cell-gap
-       :axes
-       [{:orient :right :scale :sy :domain false :title (wu/humanize h-field)} 
-        {:orient :bottom :scale :sx :labelAngle 90 :labelAlign "left" :labelBaseline :middle :domain false :title (wu/humanize v-field)}]
+          ;; actual heatmap
+          {:type "group"
+           :name "heatmap"
+           :style "cell"
+           :encode {:update {:width {:signal "hm_width"}
+                             :height {:signal "hm_height"}
+                             :fill {:value "#ccc"}}} ;TODO parameter, also see cell-gap
+           :axes
+           [{:orient :right :scale :sy :domain false :title (wu/humanize h-field)} 
+            {:orient :bottom :scale :sx :labelAngle 90 :labelAlign "left" :labelBaseline :middle :domain false :title (wu/humanize v-field)}]
 
-       :legends
-       [{:fill :color
-         :type :gradient
-         :title (wu/humanize value-field)
-         :titleOrient "bottom"
-         :gradientLength {:signal "hm_height / 2"} ;TODO not always right
-         }]
+           :legends
+           [{:fill :color
+             :type :gradient
+             :title (wu/humanize value-field)
+             :titleOrient "bottom"
+             :gradientLength {:signal "hm_height / 2"} ;TODO not always right
+             }]
 
-       :marks
-       [{:type "rect"
-         :from {:data "hm"}
-         :encode
-         {:enter
-          {:y {:field h-field :scale "sy"}
-           :x {:field v-field :scale "sx"}
-           :width {:value (- cell-size cell-gap)} :height {:value (- cell-size cell-gap)}
-           :fill {:field value-field :scale "color"}
-           :tooltip {:signal (when tooltip?
-                               (u/expand-template
-                                "{ '{h-field}': datum.{h-field}, '{v-field}': datum.{v-field}, '{value-field}': datum.{value-field}}"
-                                {:h-field (name h-field) :v-field (name v-field) :value-field (name value-field)}
-                                :key-fn keyword))}}}}
-        ]
-       }
-      ]}))
+           :marks
+           [{:type "rect"
+             :from {:data "hm"}
+             :encode
+             {:enter
+              {:y {:field h-field :scale "sy"}
+               :x {:field v-field :scale "sx"}
+               :width {:value (- cell-size cell-gap)} :height {:value (- cell-size cell-gap)}
+               :fill {:field value-field :scale "color"}
+               :tooltip {:signal (when tooltip?
+                                   (u/expand-template
+                                    "{ '{h-field}': datum.{h-field}, '{v-field}': datum.{v-field}, '{value-field}': datum.{value-field}}"
+                                    {:h-field (name h-field) :v-field (name v-field) :value-field (name value-field)}
+                                    :key-fn keyword))}}}}
+            ]
+           }
+          ]}]
+    (patch base patches)
+    ))
 
 (defn aggregate
   [data dim-cols agg-col agg-fn]
@@ -196,11 +223,14 @@
          )))
 
 
+
+
+
 ;;; This is the top-level call. Takes data and three field designators, does clustering on both dimensions
 ;;; and outputs a heatmap with dendrograms
 (defn heatmap
   [data row-field col-field value-field
-   & {:keys [aggregate-fn cluster-rows? cluster-cols? color-scheme]
+   & {:keys [aggregate-fn cluster-rows? cluster-cols?]
       :or {cluster-rows? true cluster-cols? true}
       :as options}]
   (when (and data row-field col-field value-field)
@@ -209,7 +239,8 @@
           cluster-l (when cluster-rows?
                       (cluster/cluster-data data row-field col-field value-field ))
           cluster-u (when cluster-cols?
-                      (cluster/cluster-data data col-field row-field value-field ))]
+                      (cluster/cluster-data data col-field row-field value-field ))
+          ]
       [v/vega-view (spec data row-field col-field value-field cluster-l cluster-u options) []])
     ))
 

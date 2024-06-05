@@ -130,4 +130,5 @@
       :cluster-cols? (p/param-value :hm2 :cluster-cols?)
       :color-scheme (p/param-value :hm2 :color-scheme)
       ;; TODO have a contol for this:cell-gap 0
-      ]]))
+      #_ :patches #_ [[{:orient :bottom :scale :sx}
+                       {:labelAngle 45}]]]]))
