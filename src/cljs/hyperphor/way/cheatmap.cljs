@@ -231,7 +231,7 @@
 (defn heatmap
   [data row-field col-field value-field
    & {:keys [aggregate-fn cluster-rows? cluster-cols?]
-      :or {cluster-rows? true cluster-cols? true}
+      :or {cluster-rows? true cluster-cols? true aggregate-fn :mean}
       :as options}]
   (when (and data row-field col-field value-field)
     (let [options (merge default-options options)

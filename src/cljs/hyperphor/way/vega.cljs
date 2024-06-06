@@ -1,7 +1,7 @@
 (ns hyperphor.way.vega
   (:require
+   [hyperphor.way.ui.config :as config]
    [reagent.core :as reagent]
-   [re-frame.core :as rf]
    ["react-vega" :as rv]))
 
 ;;; TODO some convenient way to call vl → vega compiler
@@ -13,7 +13,7 @@
   (when data
     [vega-lite-adapter {:data (clj->js data)
                         :spec (clj->js spec)
-                        :actions true}])) ;TODO dev mode and/or config
+                        :actions (config/config :dev-mode)}]))
 
 (def vega-adapter (reagent/adapt-react-class rv/Vega))
 
@@ -22,7 +22,7 @@
   (when data
     [vega-adapter {:data (clj->js data)
                    :spec (clj->js spec)
-                   :actions true
+                   :actions (config/config :dev-mode)
                    }]))
 
 ;;; TODO put these in groups, but :optgroups ar broken

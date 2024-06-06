@@ -1,6 +1,6 @@
 {:app-title "Way demo with Clustered Heatmaps"
  :app-main "hyperphor.way.demo.app.init" ;TODO this is also in project.clj and would be good if we could just read it from there.
  :colophon  ["Copyright © " [:a {:href "http://hyperphor.com" :style "color: white;"} "Hyperphor"] " 2020-2024"] ;TODO
- :dev-mode true
+ :dev-mode false
  :basic-auth-creds nil                  ;[name pwd]
  }

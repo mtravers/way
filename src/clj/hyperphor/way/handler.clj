@@ -176,8 +176,10 @@
 
 (defn app
   []
-  (if (config/config :dev-mode)
-    (routes rest-api site)
-    (-> (routes rest-api site)
-        (wrap-basic-authentication authenticated?))))
+  (let [base (routes rest-api site)]
+    (if (and (config/config :basic-auth)
+             (not (config/config :dev-mode)))
+      (wrap-basic-authentication base authenticated?)
+      base)))
+
 
