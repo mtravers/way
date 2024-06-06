@@ -18,6 +18,7 @@
                  [ring/ring-core "1.12.1"]
                  [ring/ring-defaults "0.5.0"]
                  [ring/ring-jetty-adapter "1.12.1"]
+                 [ring-basic-authentication "1.2.0"]
                  [ring-logger "1.1.1"]
                  [ring-middleware-format "0.7.5" :exclusions [javax.xml.bind/jaxb-api]]
 

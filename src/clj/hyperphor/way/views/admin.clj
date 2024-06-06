@@ -1,6 +1,7 @@
 (ns hyperphor.way.views.admin
   (:require [environ.core :as env]
             [hyperphor.way.views.html :as html]
+            [hyperphor.way.config :as config]
             [hiccup.util :as hu]
             )
   )
@@ -25,11 +26,13 @@
 
 (defn view
   [req]
-  (html/html-frame
-   {}
-   "Admin"
-   [:div
-    (map-table "Env" env/env)
-    (map-table "System/getenv" (System/getenv))
-    (map-table "HTTP req" req)
-    ]))
+  (if (config/config :dev-mode)
+    (html/html-frame
+     {}
+     "Admin"
+     [:div
+      (map-table "Env" env/env)
+      (map-table "System/getenv" (System/getenv))
+      (map-table "HTTP req" req)
+      ])
+    (throw (ex-info "Dev mode onlye"))))

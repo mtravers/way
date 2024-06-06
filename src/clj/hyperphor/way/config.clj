@@ -6,6 +6,11 @@
             [clojure.java.io :as io]
             ))
 
+;;; Generalized config mechanism. For actual vars, see resources/demo/config.edn
+
+;;; TODO make accessible on client
+;;; TODO make accessible at compile time?
+
 (defmethod aero/reader 'split
   [_ _ [s]]
   (and s (s/split s #",")))

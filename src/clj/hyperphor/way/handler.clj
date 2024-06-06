@@ -3,12 +3,13 @@
             [compojure.route :as route]
             [ring.middleware.format :refer [wrap-restful-format]]
             [ring.middleware.format-response :refer [wrap-restful-response]]
-            #_ [ring.middleware.basic-authentication :refer [wrap-basic-authentication]]
+            [ring.middleware.basic-authentication :refer [wrap-basic-authentication]]
             [org.candelbio.multitool.core :as u]
             [org.candelbio.multitool.cljcore :as ju]
             [hyperphor.way.views.html :as html]
             [hyperphor.way.views.admin :as admin]
             [hyperphor.way.data :as data]
+            [hyperphor.way.config :as config]
             [ring.logger :as logger]
             [ring.middleware.session.memory :as ring-memory]
             [ring.middleware.resource :as resource]
@@ -21,15 +22,12 @@
   (:use [hiccup.core])
   )
 
-;;; TEMP obviously, to be replaced with actual authentication and user state
-(def basic-auth-creds  ["foo" "bar"])   ;;;; TODO get from env
-
 ;;; Ensure API and site pages use the same store, so authentication works for API.
 (defonce common-store (ring-memory/memory-store))
 
 (defn authenticated?
   [name pass]
-  (= [name pass] basic-auth-creds))
+  (= [name pass] (config/config :basic-auth-creds)))
 
 (defn content-response
   [data & [status]]
@@ -49,22 +47,9 @@
     (html/html-frame-spa))
    "text/html"))
 
-;;; Standin sample view
-(defn sample-view
-  [id]
-  (response/content-type
-   (content-response
-    (html/html-frame
-     {} (str "Sample " id)
-     [:h3 "Imagine a Vitessce view of " id " here."]
-     ))
-   "text/html"))
-
 (defroutes site-routes
   (GET "/" [] (spa))                    ;index handled by spa
-  ;; For dev only, currently is a security hole
-  #_ (GET "/admin" req (admin/view req))
-  (GET "/sample/:id" [id] (sample-view id) )
+  (GET "/admin" req (admin/view req))
   (GET "*" [] (spa))                    ;default is handled by spa
   (route/not-found "Not found")         ;TODO this  will never be reached? But spa should do something reasonable with bad URLs
   )
@@ -163,12 +148,12 @@
 
 (defroutes api-routes  
   (context "/api/v2" []
-
-    ;; WAY for following
     (GET "/data" req                    ;params include data-id and other
       (content-response (data/data (:params req))))
+    #_                                  ;TODO dev-mode only
     (GET "/error" req                   ;For testing error reporting
       (content-response (/ 0 0)))
+    #_
     (POST "/error" req                   ;For testing error reporting
       (content-response (/ 0 0)))
 
@@ -187,8 +172,10 @@
       (wrap-filter "/api/*")            ;filter early so edn responses don't go to regular site requests
       ))
 
-(def app
-  (routes rest-api site)
-  ;; authentication goes here
-  )
+(defn app
+  []
+  (if (config/config :dev-mode)
+    (routes rest-api site)
+    (-> (routes rest-api site)
+        (wrap-basic-authentication authenticated?))))
 
