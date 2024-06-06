@@ -148,6 +148,8 @@
 
 (defroutes api-routes  
   (context "/api/v2" []
+    (GET "/config" _                    ;TODO try to build config into compiled js and eliminate this
+      (content-response (config/config)))
     (GET "/data" req                    ;params include data-id and other
       (content-response (data/data (:params req))))
     #_                                  ;TODO dev-mode only

@@ -38,6 +38,11 @@
               (rest data-id)))
     {}))
 
+(rf/reg-sub
+ :loading?
+ (fn [db _]
+   (:loading? db)))
+
 (rf/reg-event-db
  :fetch
  (fn [db [_ data-id]]

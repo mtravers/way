@@ -30,9 +30,7 @@
 
 (defn config
   [& atts]
-  (if atts
-    (get-in @the-config atts)
-    @the-config))
+  (get-in @the-config atts))
 
 
 
