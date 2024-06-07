@@ -72,7 +72,7 @@
   [label contents]
   [:tr
    [:th {:scope "row"} label]
-   [:td {:colspan 4} contents]])
+   [:td {:colSpan 4} contents]])
 
 (defmethod f/fetch :hm2
   [_]
@@ -125,10 +125,11 @@
       (keyword (p/param-value :hm2 :rows))
       (keyword (p/param-value :hm2 :columns))
       (keyword (p/param-value :hm2 :values))
-      :aggregate-fn (keyword (p/param-value :hm2 :aggregate))
-      :cluster-rows? (p/param-value :hm2 :cluster-rows?)
-      :cluster-cols? (p/param-value :hm2 :cluster-cols?)
-      :color-scheme (p/param-value :hm2 :color-scheme)
-      ;; TODO have a contol for this:cell-gap 0
-      #_ :patches #_ [[{:orient :bottom :scale :sx}
-                       {:labelAngle 45}]]]]))
+      {:aggregate-fn (keyword (p/param-value :hm2 :aggregate))
+       :cluster-rows? (p/param-value :hm2 :cluster-rows?)
+       :cluster-cols? (p/param-value :hm2 :cluster-cols?)
+       :color-scheme (p/param-value :hm2 :color-scheme)
+       ;; TODO have a contol for this:cell-gap 0
+       #_ :patches #_ [[{:orient :bottom :scale :sx}
+                        {:labelAngle 45}]]}
+      ]]))

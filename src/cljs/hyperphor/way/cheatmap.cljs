@@ -22,6 +22,8 @@
    :cell-gap 1
    :aggregate-fn :mean
    :tooltip? true
+   :cluster-rows? true
+   :cluster-cols? true
    })
 
 ;;; Generates the spec for a single tree 
@@ -229,19 +231,17 @@
 ;;; This is the top-level call. Takes data and three field designators, does clustering on both dimensions
 ;;; and outputs a heatmap with dendrograms
 (defn heatmap
-  [data row-field col-field value-field
-   & {:keys [aggregate-fn cluster-rows? cluster-cols?]
-      :or {cluster-rows? true cluster-cols? true aggregate-fn :mean}
-      :as options}]
-  (when (and data row-field col-field value-field)
-    (let [options (merge default-options options)
-          data (aggregate data [row-field col-field] value-field aggregate-fn)
-          cluster-l (when cluster-rows?
-                      (cluster/cluster-data data row-field col-field value-field ))
-          cluster-u (when cluster-cols?
-                      (cluster/cluster-data data col-field row-field value-field ))
-          ]
-      [v/vega-view (spec data row-field col-field value-field cluster-l cluster-u options) []])
-    ))
+  [data row-field col-field value-field options]
+  (let [options (merge default-options options)
+        {:keys [aggregate-fn cluster-rows? cluster-cols?]} options]
+    (when (and data row-field col-field value-field)
+      (let [data (aggregate data [row-field col-field] value-field aggregate-fn)
+            cluster-l (when cluster-rows?
+                        (cluster/cluster-data data row-field col-field value-field ))
+            cluster-u (when cluster-cols?
+                        (cluster/cluster-data data col-field row-field value-field ))
+            ]
+        [v/vega-view (spec data row-field col-field value-field cluster-l cluster-u options) []])
+      )))
 
 
