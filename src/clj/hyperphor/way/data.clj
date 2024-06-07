@@ -53,39 +53,38 @@
 ;;; TODO this looks like a massive security hole. Although what harm can parsing json do?
 (defn url-data
   [{:keys [url]}]
-  (let [ext (file-ext url)]
-    ;; TODO refactor
-    (case ext
-      "json" (-> url
-                 slurp
-                 (json/read-str :key-fn keyword)
-                 coerce-numeric)
-      "csv" (->> url
-                 read-csv-maps       ;TODO wildly inefficient, rationalize all this
-                 (map u/dehumanize)
-                 coerce-numeric
-                 (map #(u/map-values nana %)) ;comparing NA and numbers breaks things
-                 )
-      "tsv" (->> url
-                 read-tsv-maps       ;TODO wildly inefficient, rationalize all this
-                 (map u/dehumanize)
-                 coerce-numeric
-                 (map #(u/map-values nana %)) ;comparing NA and numbers breaks things
-                 )
-      )
-    ))
+  (let [ext (file-ext url)
+        base (case ext
+               "json" (-> url
+                          slurp
+                          (json/read-str :key-fn keyword))
+               "csv" (->> url
+                          read-csv-maps       ;TODO wildly inefficient, rationalize all this
+                          (map u/dehumanize)
+                          )
+               "tsv" (->> url
+                          read-tsv-maps       ;TODO wildly inefficient, rationalize all this
+                          (map u/dehumanize)
+                          ))]
+    (->> base
+         coerce-numeric
+         (map #(u/map-values nana %)) ;comparing NA and numbers breaks things
+         )))
 
 
-(defn data
-  [{:keys [data-id] :as params}]
-  (log/info :data params)
-  (-> (case (if (vector? data-id) (first data-id) data-id) ;TODO multimethod or some other less kludgerous form
-        ;; methodize
-        ;; For debugging
-        "url" (url-data params)
-        (throw (ex-info "Bad data request" {:params params}))
-        )
-      denil))                           ;TODO temp because nil is being used to mean no value on front-end...lazy
+(defmulti data (fn [{:keys [data-id] :as params}]
+                 (prn :x data-id)
+                 (keyword data-id)))
+
+(defmethod data :default
+  [params]
+  (throw (ex-info "Bad data request" {:params params})))
+
+(defmethod data :url
+  [params]
+  (url-data params))
+
+
 
 
 
