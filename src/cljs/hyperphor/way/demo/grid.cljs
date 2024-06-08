@@ -9,5 +9,5 @@
    (let [data (f/from-url "https://vega.github.io/editor/data/gapminder.json")]
      [ag/ag-table 
       data
-      :col-defs {:country {:url-template "/country/%s"}}
+      :col-defs {:country {:url-template "/dbpedia/%s"}}
       ])])
