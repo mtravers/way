@@ -64,17 +64,19 @@
   )
 
 (defn ag-table
-  "id: a keyword to identify this table
+  "data: a seq of maps
+  id: a keyword to identify this table
   columns: seq of column ids
-  data: a seq of maps
   ag-grid-options: a map of values passed directly to ag-grid
   checkboxes?: control whether checkboxes appear, defaults true
   class: css class to use for grid
   col-defs: a map of col ids to maps. Fields are the standard ag-grid plus:
      :url-template : a format string from values to URL links
 "
-  [id columns data ag-grid-options & {:keys [checkboxes? class col-defs] :or {checkboxes? true}}]
-  (let [column-defs (mapv #(ag-col-def % (get col-defs %)) columns)]
+  [data & {:keys [checkboxes? class col-defs id columns ag-grid-options]}]
+  (let [columns (or columns (keys (first data)))
+        id (or id (gensym "ag"))
+        column-defs (mapv #(ag-col-def % (get col-defs %)) columns)]
     [:div.ag-container {:class class}
      [:div {:className "ag-theme-balham"}
       (let [grid-options

@@ -5,10 +5,9 @@
 (defn ui
   []
   [:div
-   [:p "Minimal ag-grid example"]
-   (let [data (f/from-url  "https://vega.github.io/editor/data/gapminder.json")]
+   [:p "Minimal ag-grid example (gapminder data)"]
+   (let [data (f/from-url "https://vega.github.io/editor/data/gapminder.json")]
      [ag/ag-table 
-      :demo
-      (keys (first data))
       data
+      :col-defs {:country {:url-template "/country/%s"}}
       ])])

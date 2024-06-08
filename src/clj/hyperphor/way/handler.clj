@@ -47,7 +47,7 @@
     (html/html-frame-spa))
    "text/html"))
 
-(defroutes site-routes
+(defroutes base-site-routes
   (GET "/" [] (spa))                    ;index handled by spa
   (GET "/admin" req (admin/view req))
   (GET "*" [] (spa))                    ;default is handled by spa
@@ -117,8 +117,9 @@
       (assoc-in [:session :cookie-attrs :same-site] :lax) ;for oauth
       (assoc-in [:session :store] common-store)))
 
-(def site
-  (-> site-routes
+(defn site
+  [app-site-routes]
+  (-> (routes app-site-routes base-site-routes)
       (wrap-restful-response)
       (resource/wrap-resource "public" {:allow-symlinks? true}) ;allow symlinks in static dir
       (middleware/wrap-defaults site-defaults)                                  ;TODO turn off static thing in here
@@ -175,8 +176,8 @@
       ))
 
 (defn app
-  []
-  (let [base (routes rest-api site)]
+  [app-site-routes]
+  (let [base (routes rest-api (site app-site-routes))]
     (if (and (config/config :basic-auth)
              (not (config/config :dev-mode)))
       (wrap-basic-authentication base authenticated?)
