@@ -117,7 +117,7 @@
       (assoc-in [:session :cookie-attrs :same-site] :lax) ;for oauth
       (assoc-in [:session :store] common-store)))
 
-(defn site
+(defn site-routes
   [app-site-routes]
   (-> (routes app-site-routes base-site-routes)
       (wrap-restful-response)
@@ -147,8 +147,11 @@
       (assoc-in [:session :cookie-attrs] {:http-only true, :same-site :lax})
       (assoc-in [:session :store] common-store)))
 
-(defroutes api-routes  
-  (context "/api/v2" []
+;;; TODO should be in .cljc, should be parameterizable
+(def api-base "/api")
+
+(defroutes base-api-routes  
+  (context api-base []
     (GET "/config" _                    ;TODO try to build config into compiled js and eliminate this
       (content-response (config/config)))
     (GET "/data" req                    ;params include data-id and other
@@ -163,8 +166,9 @@
     (route/not-found (content-response {:error "Not Found"}))
     ))
 
-(def rest-api
-  (-> api-routes
+(defn api-routes
+  [app-api-routes]
+  (-> (routes app-api-routes base-api-routes)
       (middleware/wrap-defaults api-defaults)
       wrap-no-read-eval
       wrap-api-exception-handling
@@ -176,8 +180,8 @@
       ))
 
 (defn app
-  [app-site-routes]
-  (let [base (routes rest-api (site app-site-routes))]
+  [app-site-routes app-api-routes]
+  (let [base (routes (api-routes app-api-routes) (site-routes app-site-routes))]
     (if (and (config/config :basic-auth)
              (not (config/config :dev-mode)))
       (wrap-basic-authentication base authenticated?)

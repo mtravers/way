@@ -32,11 +32,10 @@
       ]))
    "text/html"))
 
-;;; TODO re-integrate
 (defroutes site-routes
   (GET "/country/:id" [id] (country-view id) )
   (GET "/dbpedia/:id" [id] (dbpedia-view id) )
   )
 
-(def app (wh/app site-routes))
+(def app (wh/app site-routes (routes)))
 

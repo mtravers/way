@@ -6,6 +6,8 @@
 ;;; API utils
 ;;; Note: transit decoding happens magically
 
+(def api-base "/api")
+
 (def standard-ajax-options
   {:error-handler #(rf/dispatch [:error %1])
    :format :transit
@@ -32,8 +34,8 @@
 
 (defn api-get
   [uri options]
-  (ajax-get (str "/api/v2" uri) options))
+  (ajax-get (str "/api" uri) options))
 
 (defn api-post
   [uri options]
-  (ajax-post (str "/api/v2" uri) options))
+  (ajax-post (str "/api" uri) options)) 

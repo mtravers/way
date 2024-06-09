@@ -5,11 +5,11 @@
 
 (defn init
   [cont]
-  (api/ajax-get "/api/v2/config" {:handler #(do (reset! the-config %)
-                                                (cont %))}))
+  (api/api-get "/config" {:handler #(do (reset! the-config %)
+                                        (cont %))}))
 
 (defn config
   [& atts]
-  (assert @the-config "Config referenced beofor set")
+  (assert @the-config "Config referenced before set")
   (get-in @the-config atts))
 

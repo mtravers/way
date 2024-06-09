@@ -48,8 +48,8 @@
  (fn [db [_ data-id]]
    (let [event-params (label-params data-id)
          data-key (if (vector? data-id) (first data-id) data-id)]
-     (api/ajax-get
-      "/api/v2/data"
+     (api/api-get
+      "/data"
       {:params (merge (get-in db [:params data-id])
                       event-params
                       {:data-id data-key} ;TODO fix terminology to be consistent

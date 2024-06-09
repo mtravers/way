@@ -1,17 +1,13 @@
 (ns hyperphor.way.demo.dbpedia
   (:require [clj-http.client :as client]
             [org.candelbio.multitool.core :as u]
-            [hyperphor.way.web-utils :as wu]
             [clojure.string :as str]
             ))
 
+;;; :@foo breaks Clojure reader, but this works
 (u/defn-memoized atkey
   [key]
   (keyword (str "@" (name key))))
-
-(defn en-value
-  [prop-value]
-)
 
 (defn humanize
   [term]
@@ -24,13 +20,15 @@
   [ent]
   [:a {:href ent} (humanize ent)])
 
-(defn ljoin
+;;; Added to multitool
+(defn join-seq
   [sep seq]
   (cond (empty? seq) '()
         (empty? (rest seq)) seq
         :else
-        (cons (first seq) (cons sep (ljoin sep (rest seq))))))
+        (cons (first seq) (cons sep (join-seq sep (rest seq))))))
 
+;;; TODO linkify ordinary URLs
 (defn render-value
   [v]
   (cond (and (map? v) (get v (atkey :value))) (get v (atkey :value))
@@ -38,7 +36,7 @@
         (get (u/some-thing #(= "en" (get % (atkey :language)))
                            v)
              (atkey :value))
-        (sequential? v) `[:span ~@(ljoin ", " (map render-value v))]
+        (sequential? v) `[:span ~@(join-seq ", " (map render-value v))]
         (not (string? v)) (str v)
         (re-matches #"http://dbpedia.org/resource/(.+)" v) (dbpedia-link (second (re-matches #"http\:\/\/dbpedia.org/resource/(.+)" v)))
         :else
@@ -56,9 +54,3 @@
         [:th (name k)]
         [:td (render-value v)]])]))
 
-
-#_
-     [:tr
-      [:th "Abstract"]
-      [:td (en-value (:abstract graph))]
-      ]
