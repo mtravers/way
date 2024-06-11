@@ -50,8 +50,8 @@
 (defroutes base-site-routes
   (GET "/" [] (spa))                    ;index handled by spa
   (GET "/admin" req (admin/view req))
-  (GET "*" [] (spa))                    ;default is handled by spa
-  (route/not-found "Not found")         ;TODO this  will never be reached? But spa should do something reasonable with bad URLs
+  #_ (GET "*" [] (spa))                    ;default is handled by spa
+  (route/not-found "Not found")
   )
 
 ;;; Must be something built-in for this?
@@ -163,6 +163,7 @@
     (POST "/error" req                   ;For testing error reporting
       (content-response (/ 0 0)))
 
+    #_
     (route/not-found (content-response {:error "Not Found"}))
     ))
 

@@ -40,7 +40,7 @@
                  ]
   :main ^:skip-aot hyperphor.way.demo.core
   :source-paths ["src/cljc" "src/clj" "src/cljs"] 
-  :clean-targets [".shadow-cljs"]
+  :clean-targets ^{:protect false} [".shadow-cljs" "resources/public/cljs-out"]
   :repl-options {:init-ns hyperphor.way.demo.core}
 
   :profiles {:uberjar {:aot :all

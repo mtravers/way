@@ -87,4 +87,4 @@
 
 (defn ^:export init
   []
-  (init/init app-ui))
+  (init/init app-ui nil))
