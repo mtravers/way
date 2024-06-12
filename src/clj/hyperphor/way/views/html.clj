@@ -109,20 +109,16 @@
              :integrity "sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
              :crossorigin "anonymous"}]
      ~@(map (fn [css] [:link {:href css :rel "stylesheet"}])
-            (concat
-             fixed-css
-             (config/config :css)))
+            (concat fixed-css (config/config :css)))
      ]
-
-    [:body {:height 5000}              ;TODO prevents aannoying scroll behavior, but clearly not the right thing
+    [:body {:height 5000}              ;TODO prevents annoying scroll behavior, but clearly not the right thing
      [:div#app]
      ~(app-html)
      [:script {:src "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
                :integrity "sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
                :crossorigin "anonymous"}]
-     [:script ~(format "window.onload = function() { %s(); }"
-                      (config/config :app-main ))]
-     ;; TODO app-specific .js
+     ~@(map (fn [js] [:script {:src js}]) (config/config :js))
+     [:script ~(format "window.onload = function() { %s(); }" (config/config :app-main ))]
      ]]))
 
 

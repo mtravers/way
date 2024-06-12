@@ -1,5 +1,4 @@
 {
-
  ;; Idenitty
  :app-title "Way demo with Clustered Heatmaps"
  :app-main "hyperphor.way.demo.app.init" ;TODO this is also in project.clj and would be good if we could just read it from there.
@@ -11,5 +10,6 @@
 
  ;; Customization
  :css []                                ;["/css/foo.css"]
- :js []                                 ;TODO not yet implemented
+ :js ["demo/js/leader-line.min.js"]         ;TODO not yet implemented
+
  }
