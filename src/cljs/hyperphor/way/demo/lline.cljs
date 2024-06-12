@@ -1,16 +1,21 @@
 (ns hyperphor.way.demo.lline
-  (:require [reagent.core :as reagent])
-  )
+  (:require [reagent.core :as reagent]
+            ))
 
 (defn line-component [from to params]
-  (reagent/create-class
-   {:component-did-mount
-    (fn []
-      (js/LeaderLine. (.getElementById js/document from)
-                      (.getElementById js/document to)
-                      (clj->js params)))
-    :reagent-render
-    (fn [] [:div])}))
+  (let [local-state (reagent/atom nil)]
+    (reagent/create-class
+     {:component-did-mount
+      (fn []
+        (reset! local-state
+                (js/LeaderLine. (.getElementById js/document from)
+                                (.getElementById js/document to)
+                                (clj->js params))))
+      :component-will-unmount
+      (fn []
+        (.remove @local-state))
+      :reagent-render
+      (fn [] [:div])})))
 
 (defn ui
   []
