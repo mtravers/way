@@ -80,9 +80,9 @@
      :home about
      :heatmap_basic hm/ui
      :heatmap_flex hm2/ui
-     ;; :form_test forms/ui
      :grid_basic grid/ui
      :leader_line lline/ui
+     :forms forms/ui
      )]
    #_ [footer]
    ])

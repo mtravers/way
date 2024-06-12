@@ -4,6 +4,8 @@
             [hyperphor.way.web-utils :as wu]
             ))
 
+;;; TODO integrate with form
+
 ;;; TODO maybe generalize this pattern to -before, and other event handlers. 
 (defmulti set-param-after (fn [db [_ data-id param value]] [data-id param]))
 
