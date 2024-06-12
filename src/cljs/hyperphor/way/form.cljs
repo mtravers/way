@@ -10,6 +10,16 @@
 ;;; Status: carved out of traverse.ops, not yet integrated
 ;;; TODO param stuff should go through here I guess. Or do we need both levels of abstraction?
 
+(rf/reg-sub
+ :form-field-value
+ (fn [db [_ field]]
+   (get-in (:form db) field)))
+
+(rf/reg-event-db
+ :set-form-field-value
+ (fn [db [_ field value]]
+   (assoc-in db (cons :form field) value)))
+
 ;;; ⦿| forms |⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾
 
 
@@ -23,7 +33,6 @@
 ;;;   disabled?
 ;;;   a docstring (with optional HTML) (TODO)
 
-;;; 
 (defmulti form-field (fn [{:keys [type path label id hidden? disabled? doc] :as args}]
                        type))
 
@@ -86,6 +95,7 @@
 
 
 ;;; TODO option processing, labels/hierarchy etc.
+;;; TODO might need to translate from none-value to nil
 (defmethod form-field :select [{:keys [path read-only doc hidden? options id]}]
   (let [disabled? false
         value @(rf/subscribe [:form-field-value path])
@@ -104,41 +114,12 @@
     :multiple "true"                    ;TODO should be an option
     :on-change (fn [e]
                  (rf/dispatch
+                  ;; TODO wrong for multiple files? Argh
                   [:set-form-field-value path (-> e .-target .-value)]))
     }])
 
 
 ;; --}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{--}{
-
-
-(defn- select-option
-  [label-attribute entity]
-  {:value (:db/id entity)
-   :label (label-attribute entity)})
-
-(def none-value "--none--")              ;need a non-nil value to mean none
-
-(defn- select-options
-  [label-attribute entities optional?]
-  (let [base (sort-by (comp str/lower-case :label)
-                      (map (partial select-option label-attribute) entities))]
-    (if optional?
-      (cons {:value none-value :label  "<None>"} base)
-      base)))
-
-;;; This is to make sure that the default select option, visible to the user, is also
-;;; set in the database. It's a hack, maybe should be combined with wu/select-widget
-(defn- magic-select-widget 
-  [id value dispatch options & [disabled?]]
-  (when (not (some #(= value (:value %)) options))
-    (dispatch (:value (first options))))
-  (if (empty? options)
-    [:div.alert.alert-warning "You need to create a " (name id) " first!" ] ;TODO should disable perform button
-    (wu/select-widget id value dispatch options nil disabled?)))
-
-
-
-
 
 
 
@@ -161,13 +142,6 @@
     :class-name        "react-select-container"
     :class-name-prefix "react-select"
     }])
-
-
-
-
-
-
-
  
 ;;; Assumes all :hidden fields are sequences from checkboxes, which is true for now
 #_
@@ -202,18 +176,7 @@
 
    ])
 
-(rf/reg-sub
- :form-field-value
- (fn [db [_ field]]
-   (get-in (:form db) field)))
 
-(rf/reg-event-db
- :set-form-field-value
- (fn [db [_ field value]]
-   (let [value (if (or (= value none-value) #_(empty? value))
-                 nil
-                 value)]
-     (assoc-in db (cons :form field) value))))
 
 ;;; TODO complete → valid
 
