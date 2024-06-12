@@ -50,6 +50,10 @@
     (or (.-name thing)
         thing)))
 
+;;; UI
+
+;;; TODO use Boostrap horizontal form layout https://getbootstrap.com/docs/5.0/forms/layout/
+
 (defn select-widget-parameter
   [data-id param-id values & {:keys [default extra-action]}]
   ;;; TODO didn't I mane this work better in Wayne? Thought I did...
@@ -128,6 +132,7 @@
     {:name param-id
      :id param-id
      :value @(rf/subscribe [:param data-id param-id])
+     :style {:display "inline"}         ;TODO 
      :on-change (fn [e]
                   (rf/dispatch
                    [:set-param data-id param-id (-> e .-target .-value)]))}

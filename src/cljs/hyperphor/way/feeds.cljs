@@ -43,6 +43,9 @@
  (fn [db _]
    (:loading? db)))
 
+;;; Does the actual fetch, using parameters from the database
+;;; TODO that is ugly and unmodular, should be fixed.
+;;;    Or is it? Kind of declarative, fits in with react dataflow model
 (rf/reg-event-db
  :fetch
  (fn [db [_ data-id]]
@@ -60,7 +63,7 @@
      (-> db
          (assoc :loading? true)
          ;; blanks out view in between updates, which we don't want
-         ;(assoc-in [:data-status data-id] :fetching)
+         ;; (assoc-in [:data-status data-id] :fetching)
          ))))
 
 (rf/reg-event-db
@@ -91,7 +94,6 @@
        (:invalid nil) (do (rf/dispatch [:fetch data-id])
                           data)))))
 
-;;; Was loaded, but that had bad def and I think not actually used.
 (defmulti postload (fn [db id data] id))
 
 (defmethod postload :default

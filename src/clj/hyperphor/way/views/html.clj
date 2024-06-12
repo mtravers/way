@@ -33,35 +33,41 @@
 (defn home-link []
   [:a {:href "/"} "Home"])              ;TODO should be customizable
 
+(def fixed-css
+  ["/css/way.css"
+   "https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+   "https://fonts.googleapis.com/icon?family=Material+Icons"
+   "/css/ag-grid/ag-grid.css"
+   "/css/ag-grid/ag-theme-balham.css"])
+
+;;; TODO should be merged with spa
 (defn html-frame
   [{:keys [page]} title contents]
   ;; should be a template I suppose but this was faster
   (html
-   [:html
+  `[:html
     [:head
-     [:title (html-flatten title)]
+     [:title ~(html-flatten title)]
      [:meta {:charset "UTF-16"}]
-     [:link {:href "https://fonts.googleapis.com/icon?family=Material+Icons"
-             :rel "stylesheet"}]
      [:link {:href "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
              :rel "stylesheet"
              :integrity "sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
              :crossorigin "anonymous"}]
-     [:link {:rel "stylesheet"
-             :href "/css/way.css"}]   ;TODO
-     [:link {:href "https://fonts.googleapis.com/css2?family=Roboto&display=swap"
-             :rel"stylesheet"}]
-     [:link {:href "https://fonts.googleapis.com/icon?family=Material+Icons"
-             :rel "stylesheet"}]
+     ~@(map (fn [css] [:link {:href css :rel "stylesheet"}])
+            (concat
+             fixed-css
+             (config/config :css)))
+     
      ]
     [:body 
      [:div.header
       [:div.header-ic]
-      [:h1.titles (home-link) "/" title]
+      [:h1.titles ~(home-link) "/" ~title]
       #_
       (when-let [email (login/user)]
         [:span "Hello, " email ])
       #_ cnav/pici
+      #_
       (when-not (= page :login)
         [:nav.navbar.navbar-expand-lg.bg-dark.navbar-dark
          [:ul.navbar-nav.mr-auto
@@ -69,13 +75,15 @@
           ]])
       ]
      [:div.container.main
-      contents]
+      ~contents]
      [:script {:src "https://code.jquery.com/jquery-3.5.1.slim.min.js"
                :integrity "sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
                :crossorigin "anonymous"}]
      [:script {:src "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
                :integrity "sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-               :crossorigin "anonymous"}]]]))
+               :crossorigin "anonymous"}]
+     ;; TODO app .js
+     ]]))
 
 (defn app-url []
   (format "/cljs-out/%s-main.js"
@@ -92,35 +100,29 @@
 (defn html-frame-spa
   []
   (html
-   [:html
+   `[:html
     [:head
-     [:title (config/config :app-title)]
+     [:title ~(config/config :app-title)]
      [:meta {:charset "UTF-16"}]
-     [:link {:href "https://fonts.googleapis.com/icon?family=Material+Icons"
-             :rel "stylesheet"}]
      [:link {:href "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
              :rel "stylesheet"
              :integrity "sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
              :crossorigin "anonymous"}]
-     [:link {:rel "stylesheet" :href "/css/way.css"}] ;TODO
-     #_ [:link {:rel "stylesheet" :href "/css/re-com.css"}]
-     ;; Seems to not work with bootstrap?
-     [:link {:href "https://fonts.googleapis.com/icon?family=Material+Icons"
-             :rel "stylesheet"}]
-     [:link {:href "/css/ag-grid/ag-grid.css"
-             :rel "stylesheet"}]
-     [:link {:href "/css/ag-grid/ag-theme-balham.css"
-             :rel "stylesheet"}]
+     ~@(map (fn [css] [:link {:href css :rel "stylesheet"}])
+            (concat
+             fixed-css
+             (config/config :css)))
      ]
 
     [:body {:height 5000}              ;TODO prevents aannoying scroll behavior, but clearly not the right thing
      [:div#app]
-     (app-html)
+     ~(app-html)
      [:script {:src "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
                :integrity "sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
                :crossorigin "anonymous"}]
-     [:script (format "window.onload = function() { %s(); }"
+     [:script ~(format "window.onload = function() { %s(); }"
                       (config/config :app-main ))]
+     ;; TODO app-specific .js
      ]]))
 
 
