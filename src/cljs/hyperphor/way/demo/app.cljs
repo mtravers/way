@@ -12,6 +12,7 @@
    [hyperphor.way.demo.heatmap :as hm]
    [hyperphor.way.demo.heatmap2 :as hm2]
    [hyperphor.way.demo.grid :as grid]
+   [hyperphor.way.demo.lline :as lline]
    [hyperphor.way.demo.forms :as forms]
    [org.candelbio.multitool.core :as u]
    [org.candelbio.multitool.browser :as browser]
@@ -81,6 +82,7 @@
      :heatmap_flex hm2/ui
      ;; :form_test forms/ui
      :grid_basic grid/ui
+     :leader_line lline/ui
      )]
    #_ [footer]
    ])
