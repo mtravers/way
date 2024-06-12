@@ -16,7 +16,7 @@
   []
 
   [:div.row
-   [:div "A demo of the use of the very cute " [:a {:href "https://anseki.github.io/leader-line/"} "LeaderLine library"]]
+   [:div "A demo of the use of the very cute " [:a {:href "https://anseki.github.io/leader-line/"} "LeaderLine library"] ", and how to integrate random non-react js in general."]
    [:div.col-6
     [:button#foo.button "Foo"]]
    [:div.col-6

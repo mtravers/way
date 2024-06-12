@@ -9,7 +9,7 @@
  :basic-auth-creds nil                  ;[name pwd]
 
  ;; Customization
- :css []                                ;["/css/foo.css"]
- :js ["demo/js/leader-line.min.js"]         ;TODO not yet implemented
+ :css []
+ :js ["demo/js/leader-line.min.js"]
 
  }
