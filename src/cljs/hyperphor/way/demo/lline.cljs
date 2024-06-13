@@ -1,5 +1,7 @@
 (ns hyperphor.way.demo.lline
   (:require [reagent.core :as reagent]
+            [hyperphor.way.form :as f]
+            [re-frame.core :as rf]
             ))
 
 (defn line-component [from to params]
@@ -19,14 +21,15 @@
 
 (defn ui
   []
-
   [:div.row
-   [:div "A demo of the use of the very cute " [:a {:href "https://anseki.github.io/leader-line/"} "LeaderLine library"] ", and how to integrate random non-react js in general."]
+   [:div.alert.alert-info "A demo of the use of the very cute " [:a {:href "https://anseki.github.io/leader-line/"} "LeaderLine library"] ", and how to integrate random non-react js in general."]
    [:div.col-6
-    [:button#foo.button "Foo"]]
+    [f/form-field {:path [:llines 1] :id "foo" :style {:width "200px"} :init "Type here"}]]
    [:div.col-6
     [:div {:style {:height "100px"}}]
-    [:button#bar.button "Bar"]]
+    (let [v @(rf/subscribe [:form-field-value [:llines 1]])]
+      #_[:button#bar.button "Bar"]
+      [:span#bar.border.border-primary.p-3 v])]
    [line-component "foo" "bar" {:size 5
                                 :startPlug "square"
                                 :endPlug "hand"

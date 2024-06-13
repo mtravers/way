@@ -70,20 +70,24 @@
      ]))
 
 (defmethod form-field :default
-  [{:keys [type path label id hidden? disabled? value-fn] :as args :or {value-fn identity}}]
-  [:input.form-control
-   {:id id
-    :value @(rf/subscribe [:form-field-value path])
-;    :disabled false
-    :on-change (fn [e]
-                 (rf/dispatch
-                  [:set-form-field-value path (value-fn (-> e .-target .-value))]))
-    ;; TODO
-    #_ :on-key-press #_ (fn [evt]
-                    (when (= "Enter" (.-key evt))
-                      (prn :enter path)
-                      nil))
-    }])
+  [{:keys [type path label id hidden? disabled? value-fn style init] :as args :or {value-fn identity }}]
+  (let [value @(rf/subscribe [:form-field-value path])]
+    ;; TODO propaget this to other methods. Really need :before, maybe I should switch to methodical
+    (when (and init (not value)) (rf/dispatch [:set-form-field-value path init]))
+    [:input.form-control
+     {:id id
+      :style style
+      :value value
+      ;;    :disabled false
+      :on-change (fn [e]
+                   (rf/dispatch
+                    [:set-form-field-value path (value-fn (-> e .-target .-value))]))
+      ;; TODO
+      #_ :on-key-press #_ (fn [evt]
+                            (when (= "Enter" (.-key evt))
+                              (prn :enter path)
+                              nil))
+      }]))
 
 ;;; TODO restrict keys or show warning if content is not legal number
 (defmethod form-field :number
@@ -91,9 +95,10 @@
   (form-field (assoc args :type :default :value-fn u/coerce-numeric)))
 
 (defmethod form-field :textarea
-  [{:keys [id path read-only]}]
+  [{:keys [type path label id hidden? disabled? value-fn style] :as args :or {value-fn identity width "100%"}}]
   [:textarea.form-control
    {:id id
+    :style style
     :value @(rf/subscribe [:form-field-value path])
 ;    :disabled false
     :on-change (fn [e]
@@ -123,12 +128,13 @@
    elt))
 
 (defmethod form-field :set
-  [{:keys [path elements id read-only doc type hidden]}]
+  [{:keys [path elements id read-only doc type hidden style]}]
   [:div
    (doall 
     (for [elt elements
           :let [id (str/join "-" (cons id (map name (conj path elt))))]]
       [:span.form-check.form-check-inline
+       {:style style}
        [:label.form-check-label {:for id} (name elt)]
        [:input.form-check-input
         {:id id
@@ -143,11 +149,12 @@
 
 ;;; See radio-button groups https://getbootstrap.com/docs/5.3/components/button-group/#checkbox-and-radio-button-groups
 (defmethod form-field :oneof
-  [{:keys [path elements id read-only doc type hidden]}]
+  [{:keys [path elements id read-only doc type hidden style]}]
   [:div
    (doall
     (for [elt elements]
       [:span.form-check.form-check-inline
+       {:style style}
        [:label.form-check-label {:for id} (name elt)]
        [:input.form-check-input
         {:name id
@@ -165,7 +172,7 @@
 ;;; TODO option processing, labels/hierarchy etc.
 ;;; TODO might need to translate from none-value to nil
 (defmethod form-field :select
-  [{:keys [path read-only doc hidden? options id]}]
+  [{:keys [path read-only doc hidden? options id width]}]
   (let [disabled? false
         value @(rf/subscribe [:form-field-value path])
         dispatch #(rf/dispatch [:set-form-field-value path %])]
