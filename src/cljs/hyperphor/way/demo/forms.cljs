@@ -10,7 +10,7 @@
   []
   [:div
    [:h3 "Form"]
-   [:form
+   [:form.wform
     [f/form-field-row {:path [:form-demo :basic]}]
     [f/form-field-row {:path [:form-demo :number] :type :number}]
     [f/form-field-row {:path [:form-demo :boolean] :type :boolean}]

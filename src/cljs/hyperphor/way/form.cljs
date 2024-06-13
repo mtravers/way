@@ -47,7 +47,7 @@
   [{:keys [type path label id hidden? disabled?] :as args}]
   (let [label (or label (name (last path)))
         id (or id (str/join "-" (map name path)))]
-    [:div.row.mb-3
+    [:div.row
      [:label.col-sm-2.col-form-label {:for id} label]
      [:div.col-10
       (form-field (assoc args :id id :label label))
