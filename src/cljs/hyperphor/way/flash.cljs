@@ -3,7 +3,10 @@
    [re-frame.core :as rf]))
 
 ;;; Flash message component (the colored temporary banner, displayed in response to an action)
+;;; TODO caller control of rendering (fixed font for internal errors, not for normal person errors)
 
+;;; (rf/dispatch [:flash {:message (str "Submitted: " %) :class class})
+;;; class can be "alert-success", "alert-danger", "alert-warning", "alert-info", see bootstrap doc
 (rf/reg-event-db
  :flash
  (fn [db [_ data]]
