@@ -1,11 +1,9 @@
 (ns hyperphor.way.form
   (:require [re-frame.core :as rf]
             [org.candelbio.multitool.core :as u]
-            [ajax.url :as aurl]
             [clojure.string :as str]
             [hyperphor.way.web-utils :as wu]
-            )  )
-
+            ))
 
 ;;; Status: carved out of traverse.ops, not yet integrated
 ;;; TODO param stuff should go through here I guess. Or do we need both levels of abstraction?
@@ -19,6 +17,11 @@
  :set-form-field-value
  (fn [db [_ field value]]
    (assoc-in db (cons :form field) value)))
+
+(rf/reg-event-db
+ :update-form-field-value
+ (fn [db [_ field f & args]]
+   (apply update-in db (cons :form field) f args)))
 
 ;;; ⦿| forms |⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾
 
@@ -50,7 +53,8 @@
       (form-field (assoc args :id id :label label))
       ]]))
 
-(defmethod form-field :default [{:keys [type path label id hidden? disabled? value-fn] :as args :or {value-fn identity}}]
+(defmethod form-field :default
+  [{:keys [type path label id hidden? disabled? value-fn] :as args :or {value-fn identity}}]
   [:input.form-control
    {:id id
     :value @(rf/subscribe [:form-field-value path])
@@ -66,10 +70,12 @@
     }])
 
 ;;; TODO restrict keys or show warning if content is not legal number
-(defmethod form-field :number [{:keys [] :as args}]
+(defmethod form-field :number
+  [{:keys [] :as args}]
   (form-field (assoc args :type :default :value-fn u/coerce-numeric)))
 
-(defmethod form-field :textarea [{:keys [id path read-only]}]
+(defmethod form-field :textarea
+  [{:keys [id path read-only]}]
   [:textarea.form-control
    {:id id
     :value @(rf/subscribe [:form-field-value path])
@@ -83,7 +89,8 @@
 
 
 ;;; TODO producing react warnings
-(defmethod form-field :boolean [{:keys [path id read-only doc type hidden]}]
+(defmethod form-field :boolean
+  [{:keys [path id read-only doc type hidden]}]
   [:input.form-check-input
    {:id id
     :type "checkbox"
@@ -93,10 +100,54 @@
                  (rf/dispatch
                   [:set-form-field-value path (-> e .-target .-checked)]))}])
 
+(defn set-element
+  [s elt in?]
+  ((if in? conj disj)
+   (or s #{})
+   elt))
+
+(defmethod form-field :set
+  [{:keys [path elements id read-only doc type hidden]}]
+  [:div
+   (for [elt elements
+         :let [id (str/join "-" (cons id (map name (conj path elt))))]]
+     [:span.form-check.form-check-inline
+      [:label.form-check-label {:for id} (name elt)]
+      [:input.form-check-input
+       {:id id
+        :type "checkbox"
+        :checked @(rf/subscribe [:form-field-value (conj path elt)])
+        :disabled read-only
+        :on-change (fn [e]
+                     (rf/dispatch
+                      [:update-form-field-value path set-element elt (-> e .-target .-checked)]))}
+       ]])])
+
+
+;;; See radio-button groups https://getbootstrap.com/docs/5.3/components/button-group/#checkbox-and-radio-button-groups
+(defmethod form-field :oneof
+  [{:keys [path elements id read-only doc type hidden]}]
+  [:div
+   (for [elt elements]
+     [:span.form-check.form-check-inline
+      [:label.form-check-label {:for id} (name elt)]
+      [:input.form-check-input
+       {:name id
+        :type "radio"
+        :checked @(rf/subscribe [:form-field-value (conj path elt)])
+        :disabled read-only
+        :on-change (fn [e]
+                     (rf/dispatch
+                      [:set-form-field-value path elt]))}
+       ]])])
+
+;;; TODO radiobuttons
+
 
 ;;; TODO option processing, labels/hierarchy etc.
 ;;; TODO might need to translate from none-value to nil
-(defmethod form-field :select [{:keys [path read-only doc hidden? options id]}]
+(defmethod form-field :select
+  [{:keys [path read-only doc hidden? options id]}]
   (let [disabled? false
         value @(rf/subscribe [:form-field-value path])
         dispatch #(rf/dispatch [:set-form-field-value path %])]
@@ -106,16 +157,34 @@
 ;;; TODO multiselect
 
 
+
 ;;; For upload
-(defmethod form-field :local-files [{:keys [id path read-only doc type hidden]}]
+(defmethod form-field :local-files
+  [{:keys [id path read-only doc type hidden]}]
   [:input.form-control
    {:id id
     :type "file"
-    :multiple "true"                    ;TODO should be an option
+    :multiple true                    ;TODO should be an option
     :on-change (fn [e]
                  (rf/dispatch
                   ;; TODO wrong for multiple files? Argh
                   [:set-form-field-value path (-> e .-target .-value)]))
+    }])
+
+
+(defmethod form-field :local-directory
+  [{:keys [id path read-only doc type hidden]}]
+  [:input.form-control
+   {:id id
+    :type "file"
+    :multiple true
+    :webkitdirectory "true"               ;black magic to enable folder uploads
+    :mozdirectory "true"
+    :directory "true"
+    :on-change (fn [e]
+                 (rf/dispatch
+                  ;; TODO wrong for multiple files? Argh
+                  [:set-form-field-value path (-> e .-target .-value)]))    
     }])
 
 
