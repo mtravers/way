@@ -10,15 +10,15 @@
   [:div
    [:h3 "Form"]
    [f/wform
-    [{:path [:form-demo :basic]}
-     {:path [:form-demo :number] :type :number}
-     {:path [:form-demo :boolean] :type :boolean}
-     {:path [:form-demo :set] :type :set :elements [:oxygen :nitrogen :helium :polonium :tungsten]}
-     {:path [:form-demo :oneof] :type :oneof :elements [:hobbit :elf :dwarf :human :ainur :ent]}
-     {:path [:form-demo :select] :type :select :options ["Male" "Female" "Agender" "Polygender" "Prefer not to say"]}
-     {:path [:form-demo :textarea] :type :textarea}
-     {:path [:form-demo :local-files] :type :local-files}
-     {:path [:form-demo :local-directory] :type :local-directory}]
+    [{:path [:form-demo :basic] :doc "A basic text field"}
+     {:path [:form-demo :number] :type :number :doc "A numeric field"}
+     {:path [:form-demo :boolean] :type :boolean :doc "Yes or no"}
+     {:path [:form-demo :set] :type :set :elements [:oxygen :nitrogen :helium :polonium :tungsten] :doc "Any or all of a fixed set"}
+     {:path [:form-demo :oneof] :type :oneof :elements [:hobbit :elf :dwarf :human :ainur :ent] :doc "One or a fixed set"}
+     {:path [:form-demo :select] :type :select :options ["Male" "Female" "Agender" "Polygender" "Prefer not to say"] :doc "Also one or a fixed set"}
+     {:path [:form-demo :textarea] :type :textarea :doc "Bigger text"}
+     {:path [:form-demo :local-files] :type :local-files :doc "Local files for uploading"}
+     {:path [:form-demo :local-directory] :type :local-directory :doc "A local directory for uploading"}]
     #(rf/dispatch [:flash {:message (str "Submitted: " %) :class "alert-success" }])
     ]
    [:h3 "Output"]

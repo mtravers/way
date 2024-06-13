@@ -7,7 +7,6 @@
 
 ;;; Status: carved out of traverse.ops, not yet integrated
 ;;; TODO param stuff should go through here. Or do we need both levels of abstraction?
-;;; TODO validation mechanism
 ;;; TODO way to supply extras or customizations
 
 (rf/reg-sub
@@ -42,15 +41,33 @@
 (defmulti form-field-row (fn [{:keys [type path label id hidden? disabled? doc] :as args}]
                            type))
 
+;;; TODO want a slightly more abstract validation mechanism
+(defmulti form-field-warnings (fn [{:keys [type path label id hidden? disabled? doc] :as args}]
+                                type))
+
+(defmethod form-field-warnings :default
+  [_]
+  nil)
+
+(defmethod form-field-warnings :number
+  [{:keys [path]}]
+  (let [value @(rf/subscribe [:form-field-value path])]
+    (cond (nil? value) nil
+          (number? value) nil
+          (empty? value) nil
+          :else [:span.alert.alert-warning "Value must be numeric"])))
+
 (defmethod form-field-row :default
-  [{:keys [type path label id hidden? disabled?] :as args}]
+  [{:keys [type path label id hidden? disabled? doc] :as args}]
   (let [label (or label (name (last path)))
         id (or id (str/join "-" (map name path)))]
     [:div.row
      [:label.col-sm-2.col-form-label {:for id} label]
-     [:div.col-10
+     [:div.col-8
       (form-field (assoc args :id id :label label))
-      ]]))
+      ]
+     [:div.col-sm-2.form-field-doc (or (form-field-warnings args) doc)]
+     ]))
 
 (defmethod form-field :default
   [{:keys [type path label id hidden? disabled? value-fn] :as args :or {value-fn identity}}]
@@ -244,50 +261,9 @@
    (doall (map form-field-row fields))
    [:button.btn.btn-primary {:type "submit" :on-click #(action (gather-fields fields))} "Submit"]])
 
-;;; TODO integrate or flush
-
-(defmulti field-valid? :type)
-
-(defmethod field-valid? :default
-  [arg]
-  @(rf/subscribe [:form-field-value (:name arg)]))
-
-(defmethod field-valid? :string
-  [arg]
-  (not (empty? @(rf/subscribe [:form-field-value (:name arg)]))))
-
-(defmethod field-valid? :columns
-  [arg]
-  (not (empty? @(rf/subscribe [:form-field-value (:name arg)]))))
-
-(defmethod field-valid? :local-files
-  [arg]
-  (not (empty? @(rf/subscribe [:form-field-value (:name arg)]))))
-
-(defmethod field-valid? :boolean
-  [_]
-  true)                                 ;booleans are always valid
 
 
-(defmulti form-valid? :id)
 
-(defmethod form-valid? :default 
-  [{:keys [args] :as op-def}]
-  (every?
-   identity
-   (for [arg args]
-     (or (:optional? arg)
-         (field-valid? arg)))))
-
-#_
-(defmethod form-valid? :upload-files 
-  [{:keys [args] :as op-def}]
-  ;; Note: the other fields should take care of themselves
-  (let [arg (fn [n] (u/some-thing #(= (:name %) n) args))]
-    (tu/oneof
-     (field-valid? (arg :gs-path))
-     (field-valid? (arg :local-files))
-     (field-valid? (arg :local-directory)))))
 
 
 
