@@ -19,24 +19,8 @@
     (assoc* m k (assoc-in* (get m k) ks v))
     (assoc* m k v)))
 
-;;; This completely does not work
-(defn invalidate
-  [db data-id param]
-  ;; Lazy, invalidate everything
-  (assoc-in* db [:data-status :*] :invalid))
-
-
-
-;;; TODO get rid of this and just use a parameter map
-;;; Totally not working any more either
-(defn label-params
-  [data-id]
-  (if (vector? data-id)
-    (if (map? (second data-id))
-      (second data-id)
-      (zipmap [:dim :feature :filters]
-              (rest data-id)))
-    {}))
+;;; Data id theory
+;;; [:id {param-map}]
 
 (rf/reg-sub
  :loading?
@@ -48,23 +32,21 @@
 ;;;    Or is it? Kind of declarative, fits in with react dataflow model
 (rf/reg-event-db
  :fetch
- (fn [db [_ data-id]]
-   (let [event-params (label-params data-id)
-         data-key (if (vector? data-id) (first data-id) data-id)]
-     (api/api-get
-      "/data"
-      {:params (merge (get-in db [:params data-id])
-                      event-params
-                      {:data-id data-key} ;TODO fix terminology to be consistent
-                      )
-       :handler #(rf/dispatch [::loaded data-id %])
-       :error-handler #(rf/dispatch [:data-error data-id %1]) ;Override standard error handler
-       })
-     (-> db
-         (assoc :loading? true)
-         ;; blanks out view in between updates, which we don't want
-         ;; (assoc-in [:data-status data-id] :fetching)
-         ))))
+ (fn [db [_ [data-key event-params :as data-id]]]
+   (api/api-get
+    "/data"
+    {:params (merge (get-in db [:params data-key])
+                    event-params
+                    {:data-id data-key} ;TODO fix terminology to be consistent
+                    )
+     :handler #(rf/dispatch [::loaded data-id %])
+     :error-handler #(rf/dispatch [:data-error data-id %1]) ;Override standard error handler
+     })
+   (-> db
+       (assoc :loading? true)
+       ;; blanks out view in between updates, which we don't want
+       ;; (assoc-in [:data-status data-id] :fetching)
+       )))
 
 (rf/reg-event-db
  :data-error
@@ -109,12 +91,10 @@
        (assoc :loading? false)
        (postload data-id data)
        )))
- 
 
 (defn from-url
   [url]
   (when url
-    (prn :from-url url)
     @(rf/subscribe [:data [:url {:url url}]])))
 
 (defmulti fetch identity)

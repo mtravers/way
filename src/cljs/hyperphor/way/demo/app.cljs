@@ -78,11 +78,12 @@
     :tab
     (array-map
      :home about
+     :data_grid grid/ui
+     :multiple_grid grid/ui-multiple
+     :forms forms/ui
+     :leader_line lline/ui
      :heatmap_basic hm/ui
      :heatmap_flex hm2/ui
-     :grid_basic grid/ui
-     :leader_line lline/ui
-     :forms forms/ui
      )]
    #_ [footer]
    ])
