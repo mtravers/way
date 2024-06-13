@@ -5,21 +5,21 @@
             ))
 
 ;;; TODO include submit or equivalent
-
 (defn ui
   []
   [:div
    [:h3 "Form"]
-   [:form.wform
-    [f/form-field-row {:path [:form-demo :basic]}]
-    [f/form-field-row {:path [:form-demo :number] :type :number}]
-    [f/form-field-row {:path [:form-demo :boolean] :type :boolean}]
-    [f/form-field-row {:path [:form-demo :set] :type :set :elements [:oxygen :nitrogen :helium :polonium :tungsten]}]
-    [f/form-field-row {:path [:form-demo :oneof] :type :oneof :elements [:hobbit :elf :dwarf :human :ainur :ent]}]
-    [f/form-field-row {:path [:form-demo :select] :type :select :options ["Male" "Female" "Agender" "Polygender" "Prefer not to say"]}]
-    [f/form-field-row {:path [:form-demo :textarea] :type :textarea}]
-    [f/form-field-row {:path [:form-demo :local-files] :type :local-files}]
-    [f/form-field-row {:path [:form-demo :local-directory] :type :local-directory}]
+   [f/wform
+    [{:path [:form-demo :basic]}
+     {:path [:form-demo :number] :type :number}
+     {:path [:form-demo :boolean] :type :boolean}
+     {:path [:form-demo :set] :type :set :elements [:oxygen :nitrogen :helium :polonium :tungsten]}
+     {:path [:form-demo :oneof] :type :oneof :elements [:hobbit :elf :dwarf :human :ainur :ent]}
+     {:path [:form-demo :select] :type :select :options ["Male" "Female" "Agender" "Polygender" "Prefer not to say"]}
+     {:path [:form-demo :textarea] :type :textarea}
+     {:path [:form-demo :local-files] :type :local-files}
+     {:path [:form-demo :local-directory] :type :local-directory}]
+    #(rf/dispatch [:flash {:message (str "Submitted: " %) :class "alert-success" }])
     ]
    [:h3 "Output"]
    [:pre

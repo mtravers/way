@@ -6,7 +6,9 @@
             ))
 
 ;;; Status: carved out of traverse.ops, not yet integrated
-;;; TODO param stuff should go through here I guess. Or do we need both levels of abstraction?
+;;; TODO param stuff should go through here. Or do we need both levels of abstraction?
+;;; TODO validation mechanism
+;;; TODO way to supply extras or customizations
 
 (rf/reg-sub
  :form-field-value
@@ -23,12 +25,9 @@
  (fn [db [_ field f & args]]
    (apply update-in db (cons :form field) f args)))
 
-;;; ⦿| forms |⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾-⦿|⦾|⦿|⦾
-
-
 ;;; Create a UI for a form field.
 ;;; Args:
-;;;   type: keyword UI type, used for dispatch (TODO allow extension, eg for special-purpose selectors)
+;;;   type: keyword UI type, used for dispatch
 ;;;   path: keyseq identifying the value
 ;;;   label: optional
 ;;;   id: optional (HTML id)
@@ -39,10 +38,10 @@
 (defmulti form-field (fn [{:keys [type path label id hidden? disabled? doc] :as args}]
                        type))
 
+;;; Note: not actually specialized at all, so maybe doesnt need to be a method
 (defmulti form-field-row (fn [{:keys [type path label id hidden? disabled? doc] :as args}]
                            type))
 
-;;; TODO labels bold, right-justified, maybe centered. See Rawsugar ops
 (defmethod form-field-row :default
   [{:keys [type path label id hidden? disabled?] :as args}]
   (let [label (or label (name (last path)))
@@ -109,37 +108,39 @@
 (defmethod form-field :set
   [{:keys [path elements id read-only doc type hidden]}]
   [:div
-   (for [elt elements
-         :let [id (str/join "-" (cons id (map name (conj path elt))))]]
-     [:span.form-check.form-check-inline
-      [:label.form-check-label {:for id} (name elt)]
-      [:input.form-check-input
-       {:id id
-        :type "checkbox"
-        :checked @(rf/subscribe [:form-field-value (conj path elt)])
-        :disabled read-only
-        :on-change (fn [e]
-                     (rf/dispatch
-                      [:update-form-field-value path set-element elt (-> e .-target .-checked)]))}
-       ]])])
+   (doall 
+    (for [elt elements
+          :let [id (str/join "-" (cons id (map name (conj path elt))))]]
+      [:span.form-check.form-check-inline
+       [:label.form-check-label {:for id} (name elt)]
+       [:input.form-check-input
+        {:id id
+         :type "checkbox"
+         :checked @(rf/subscribe [:form-field-value (conj path elt)])
+         :disabled read-only
+         :on-change (fn [e]
+                      (rf/dispatch
+                       [:update-form-field-value path set-element elt (-> e .-target .-checked)]))}
+        ]]))])
 
 
 ;;; See radio-button groups https://getbootstrap.com/docs/5.3/components/button-group/#checkbox-and-radio-button-groups
 (defmethod form-field :oneof
   [{:keys [path elements id read-only doc type hidden]}]
   [:div
-   (for [elt elements]
-     [:span.form-check.form-check-inline
-      [:label.form-check-label {:for id} (name elt)]
-      [:input.form-check-input
-       {:name id
-        :type "radio"
-        :checked @(rf/subscribe [:form-field-value (conj path elt)])
-        :disabled read-only
-        :on-change (fn [e]
-                     (rf/dispatch
-                      [:set-form-field-value path elt]))}
-       ]])])
+   (doall
+    (for [elt elements]
+      [:span.form-check.form-check-inline
+       [:label.form-check-label {:for id} (name elt)]
+       [:input.form-check-input
+        {:name id
+         :type "radio"
+         :checked @(rf/subscribe [:form-field-value (conj path elt)])
+         :disabled read-only
+         :on-change (fn [e]
+                      (rf/dispatch
+                       [:set-form-field-value path elt]))}
+        ]]))])
 
 ;;; TODO radiobuttons
 
@@ -221,33 +222,29 @@
      (inflect/pluralize (count value) (inflect/singular (name arg-name))) " checked"]
     ))
 
-(defn form
-  [{:keys [args doc op]}]
-  [:div#opform                          ; Was :form, but this way Enter key doesn't cause the apocalypse
+;;; TODO, maybe condense fields
+;;; TODO or use the same trick the pprint thing does...
+(defn gather-fields
+  [fields]
+  (u/clean-map
+   (into {}
+         (for [field fields]
+           (let [path (:path field)]
+             [path @(rf/subscribe [:form-field-value path])])))))
+
+;;; TODO separate non-SPA for files??
+(defn wform
+  [fields action]
+  [:div.wform                           ;Not :form, to prevent a page trnasition
+   #_
    {:enc-type "multipart/form-data"
     :method "POST"}
-   (when doc
-     [:div.alert.alert-piciblue doc])
-   [:table.optable.table.responsive
-    [:tbody
-     (doall                             ;re-frame requirement
-      (for [{:keys [doc hidden indent] :as arg} args]
-        (let [argname (:name arg)]      ;Avoid colliding with core/name
-          [:tr {:key argname}
-           [:th 
-            (when indent "・ ") (name argname)]
-           [:td 
-            (if hidden
-              "hidden" #_ (hidden-ui arg)
-              (form-field (assoc arg :read-only false)))]
-           [:td {:style {:padding-left "5px" :min-width "200px"}} doc]]
-          )))]]
+   #_ (when doc                            ;TODO
+        [:div.alert doc])
+   (doall (map form-field-row fields))
+   [:button.btn.btn-primary {:type "submit" :on-click #(action (gather-fields fields))} "Submit"]])
 
-   ])
-
-
-
-;;; TODO complete → valid
+;;; TODO integrate or flush
 
 (defmulti field-valid? :type)
 
@@ -271,7 +268,6 @@
   [_]
   true)                                 ;booleans are always valid
 
-;;; TODO file fields
 
 (defmulti form-valid? :id)
 
