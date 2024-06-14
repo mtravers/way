@@ -16,8 +16,11 @@
      {:path [:form-demo :set]
       :type :set
       :elements [:oxygen :nitrogen :helium :polonium :tungsten]
-      :doc [:span "Any or all of a fixed set " [:a {:href "https://en.wikipedia.org/wiki/Middle-earth_peoples" :target "_ref"} "ref"]]}
-     {:path [:form-demo :oneof] :type :oneof :elements [:hobbit :elf :dwarf :human :ainur :ent] :doc "One or a fixed set"}
+      :doc "Any or all of a fixed set "}
+     {:path [:form-demo :oneof]
+      :type :oneof
+      :elements [:hobbit :elf :dwarf :human :ainur :ent]
+      :doc [:span "One or a fixed set " [:a {:href "https://en.wikipedia.org/wiki/Middle-earth_peoples" :target "_ref"} "ref"]]}
      {:path [:form-demo :select] :type :select :options ["Male" "Female" "Agender" "Polygender" "Prefer not to say"] :doc [:span [:b "Also"] " one or a fixed set"]}
      {:path [:form-demo :textarea] :type :textarea :doc "Bigger text"}
      {:path [:form-demo :local-files] :type :local-files :doc "Local files for uploading"}

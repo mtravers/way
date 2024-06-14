@@ -44,7 +44,7 @@
 (defn html-frame
   [{:keys [page]} title contents]
   ;; should be a template I suppose but this was faster
-  (html {}
+  (html
     `[:html
       [:head
        [:title ~(html-flatten title)]
@@ -98,7 +98,7 @@
 
 (defn html-frame-spa
   []
-  (html {}
+  (html
     `[:html
       [:head
        [:title ~(config/config :app-title)]

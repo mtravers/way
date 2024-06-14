@@ -68,6 +68,8 @@
        (wu/spinner 1))]
     ]])
 
+;;; TODO for some reason there's an extra {} on Heroku deployed version, not local. No idea where its from!
+
 (defn app-ui
   []
   [:div

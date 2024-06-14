@@ -33,20 +33,22 @@
 (rf/reg-event-db
  :fetch
  (fn [db [_ [data-key event-params :as data-id]]]
-   (api/api-get
-    "/data"
-    {:params (merge (get-in db [:params data-key])
-                    event-params
-                    {:data-id data-key} ;TODO fix terminology to be consistent
-                    )
-     :handler #(rf/dispatch [::loaded data-id %])
-     :error-handler #(rf/dispatch [:data-error data-id %1]) ;Override standard error handler
-     })
-   (-> db
-       (assoc :loading? true)
-       ;; blanks out view in between updates, which we don't want
-       ;; (assoc-in [:data-status data-id] :fetching)
-       )))
+   (let [params (merge (get-in db [:params data-key]) ;TODO less certain about this...
+                       event-params
+                       {:data-id data-key} ;TODO fix terminology to be consistent
+                       )]
+     (prn :data-fetch params)
+     (api/api-get
+      "/data"
+      {:params params
+       :handler #(rf/dispatch [::loaded data-id %])
+       :error-handler #(rf/dispatch [:data-error data-id %1]) ;Override standard error handler
+       })
+     (-> db
+         (assoc :loading? true)
+         ;; blanks out view in between updates, which we don't want
+         ;; (assoc-in [:data-status data-id] :fetching)
+         ))))
 
 (rf/reg-event-db
  :data-error
