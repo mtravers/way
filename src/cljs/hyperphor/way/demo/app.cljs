@@ -11,6 +11,7 @@
    [hyperphor.way.web-utils :as wu]
    [hyperphor.way.demo.heatmap :as hm]
    [hyperphor.way.demo.heatmap2 :as hm2]
+   [hyperphor.way.demo.violin :as vi]
    [hyperphor.way.demo.grid :as grid]
    [hyperphor.way.demo.lline :as lline]
    [hyperphor.way.demo.forms :as forms]
@@ -86,6 +87,7 @@
      :data_flow lline/ui
      :heatmap_basic hm/ui
      :heatmap_flex hm2/ui
+     :violin vi/ui
      )]
    #_ [footer]
    ])

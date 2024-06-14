@@ -25,7 +25,7 @@
   (let [{:keys [show? message class]} @(rf/subscribe [:flash])]
     (when show?
       [:div.alert {:class class :style {:margin "10px"}}
-       [:button.close.float-end
+       [:button.close.float-start       ;float-end is better but runs into 10x debugger
         {:type "button" :title "Close"
          :on-click #(rf/dispatch [:flash {:show? false}])}
         [:i {:class "material-icons"} "close"]]
