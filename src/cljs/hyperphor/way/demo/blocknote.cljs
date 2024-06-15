@@ -46,10 +46,9 @@ you, this is pretty basic
 	- A [[Materialism]] very different from the scientific/atheist/rationalist variety. 
 ")
 
-
 (defn minimal
   []
-  [:f>                                  ;Magic that lets the hook call work. Don't ask
+  [:f> ;; Magic that lets the hook call work. See https://github.com/reagent-project/reagent/blob/master/doc/ReactFeatures.md#hooks
    #(let [editor (br/useCreateBlockNote)]
       [:div.container                  ;TODO layout! 
        ;; https://github.com/roman01la/uix/blob/master/core/dev/uix/recipes/interop.cljc
