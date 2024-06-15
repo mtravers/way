@@ -1,4 +1,4 @@
-(defproject hyperphor/way "0.1.0-SNAPSHOT"
+(defproject hyperphor/way "0.1.1-SNAPSHOT" ;TODO have to change deploy.sh when version changes
   :description "Way"
   :url "https://shrouded-escarpment-03060-744eda4cc53f.herokuapp.com/"
   :license {:name "EPL-2.0"
@@ -40,7 +40,7 @@
                  ]
   :main ^:skip-aot hyperphor.way.demo.core
   :source-paths ["src/cljc" "src/clj" "src/cljs"] 
-  :clean-targets ^{:protect false} [".shadow-cljs" "resources/public/cljs-out"]
+  :clean-targets ^{:protect false} ["target" ".shadow-cljs" "resources/public/cljs-out"]
   :repl-options {:init-ns hyperphor.way.demo.core}
 
   :profiles {:uberjar {:aot :all

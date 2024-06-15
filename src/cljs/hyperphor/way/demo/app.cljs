@@ -11,6 +11,7 @@
    [hyperphor.way.web-utils :as wu]
    [hyperphor.way.demo.heatmap :as hm]
    [hyperphor.way.demo.heatmap2 :as hm2]
+   [hyperphor.way.demo.violin :as vi]
    [hyperphor.way.demo.grid :as grid]
    [hyperphor.way.demo.lline :as lline]
    [hyperphor.way.demo.forms :as forms]
@@ -68,6 +69,8 @@
        (wu/spinner 1))]
     ]])
 
+;;; TODO for some reason there's an extra {} on Heroku deployed version, not local. No idea where its from!
+
 (defn app-ui
   []
   [:div
@@ -78,11 +81,13 @@
     :tab
     (array-map
      :home about
+     :data_grid grid/ui
+     :multiple_grid grid/ui-multiple
+     :forms forms/ui
+     :data_flow lline/ui
      :heatmap_basic hm/ui
      :heatmap_flex hm2/ui
-     :grid_basic grid/ui
-     :leader_line lline/ui
-     :forms forms/ui
+     :violin vi/ui
      )]
    #_ [footer]
    ])

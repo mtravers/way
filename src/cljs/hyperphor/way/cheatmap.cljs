@@ -4,7 +4,6 @@
             [org.candelbio.multitool.core :as u]
             [org.candelbio.multitool.math :as um]
             [hyperphor.way.web-utils :as wu]
-            [clojure.walk :as walk]
             )
   )
 
@@ -75,34 +74,13 @@
     :transform [{:type "filter" :expr "datum.children == 0"}]}]
   )
 
-;;; TODO in Multitool
+
+;;; todo in Multitool
 (defn concatv
   "Conj a value to the front (left) of vector. Not performant"
   [& args]
   (vec (apply concat args)))
 
-
-(defn- patch-matches?
-  [id thing]
-  (and (map? thing)
-       (every? (fn [[k v]] (= v (k thing))) id)))
-
-;;; Terrible kludge but the alternative is exposing every single Vega option explicitly?
-;;; Each patch is [<identifier> <modifier]
-;;; identifier is a map, matches maps that have equal fields
-;;; modifier is a map to be merged (recursively) with original
-;;; → multitool I guess,
-;;; Extension: check that each patch matches exactly once.
-(defn patch
-  [spec patches]
-  (reduce (fn [spec [id mods]]
-            (walk/postwalk
-             #(if (patch-matches? id %)
-                (u/merge-recursive % mods)
-                %)
-             spec))
-          spec
-          patches))
 
 (defn spec
   [data h-field v-field value-field h-clusters v-clusters
@@ -205,7 +183,7 @@
             ]
            }
           ]}]
-    (patch base patches)
+    (v/patch base patches)
     ))
 
 (defn aggregate

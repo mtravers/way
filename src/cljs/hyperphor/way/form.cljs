@@ -7,7 +7,6 @@
 
 ;;; Status: carved out of traverse.ops, not yet integrated
 ;;; TODO param stuff should go through here. Or do we need both levels of abstraction?
-;;; TODO validation mechanism
 ;;; TODO way to supply extras or customizations
 
 (rf/reg-sub
@@ -42,31 +41,53 @@
 (defmulti form-field-row (fn [{:keys [type path label id hidden? disabled? doc] :as args}]
                            type))
 
+;;; TODO want a slightly more abstract validation mechanism
+(defmulti form-field-warnings (fn [{:keys [type path label id hidden? disabled? doc] :as args}]
+                                type))
+
+(defmethod form-field-warnings :default
+  [_]
+  nil)
+
+(defmethod form-field-warnings :number
+  [{:keys [path]}]
+  (let [value @(rf/subscribe [:form-field-value path])]
+    (cond (nil? value) nil
+          (number? value) nil
+          (empty? value) nil
+          :else [:span.alert.alert-warning "Value must be numeric"])))
+
 (defmethod form-field-row :default
-  [{:keys [type path label id hidden? disabled?] :as args}]
+  [{:keys [type path label id hidden? disabled? doc] :as args}]
   (let [label (or label (name (last path)))
         id (or id (str/join "-" (map name path)))]
     [:div.row
      [:label.col-sm-2.col-form-label {:for id} label]
-     [:div.col-10
+     [:div.col-8
       (form-field (assoc args :id id :label label))
-      ]]))
+      ]
+     [:div.col-sm-2.form-field-doc (or (form-field-warnings args) doc)]
+     ]))
 
 (defmethod form-field :default
-  [{:keys [type path label id hidden? disabled? value-fn] :as args :or {value-fn identity}}]
-  [:input.form-control
-   {:id id
-    :value @(rf/subscribe [:form-field-value path])
-;    :disabled false
-    :on-change (fn [e]
-                 (rf/dispatch
-                  [:set-form-field-value path (value-fn (-> e .-target .-value))]))
-    ;; TODO
-    #_ :on-key-press #_ (fn [evt]
-                    (when (= "Enter" (.-key evt))
-                      (prn :enter path)
-                      nil))
-    }])
+  [{:keys [type path label id hidden? disabled? value-fn style init] :as args :or {value-fn identity }}]
+  (let [value @(rf/subscribe [:form-field-value path])]
+    ;; TODO propaget this to other methods. Really need :before, maybe I should switch to methodical
+    (when (and init (not value)) (rf/dispatch [:set-form-field-value path init]))
+    [:input.form-control
+     {:id id
+      :style style
+      :value value
+      ;;    :disabled false
+      :on-change (fn [e]
+                   (rf/dispatch
+                    [:set-form-field-value path (value-fn (-> e .-target .-value))]))
+      ;; TODO
+      #_ :on-key-press #_ (fn [evt]
+                            (when (= "Enter" (.-key evt))
+                              (prn :enter path)
+                              nil))
+      }]))
 
 ;;; TODO restrict keys or show warning if content is not legal number
 (defmethod form-field :number
@@ -74,9 +95,10 @@
   (form-field (assoc args :type :default :value-fn u/coerce-numeric)))
 
 (defmethod form-field :textarea
-  [{:keys [id path read-only]}]
+  [{:keys [type path label id hidden? disabled? value-fn style] :as args :or {value-fn identity width "100%"}}]
   [:textarea.form-control
    {:id id
+    :style style
     :value @(rf/subscribe [:form-field-value path])
 ;    :disabled false
     :on-change (fn [e]
@@ -106,12 +128,13 @@
    elt))
 
 (defmethod form-field :set
-  [{:keys [path elements id read-only doc type hidden]}]
+  [{:keys [path elements id read-only doc type hidden style]}]
   [:div
    (doall 
     (for [elt elements
           :let [id (str/join "-" (cons id (map name (conj path elt))))]]
       [:span.form-check.form-check-inline
+       {:style style}
        [:label.form-check-label {:for id} (name elt)]
        [:input.form-check-input
         {:id id
@@ -126,11 +149,12 @@
 
 ;;; See radio-button groups https://getbootstrap.com/docs/5.3/components/button-group/#checkbox-and-radio-button-groups
 (defmethod form-field :oneof
-  [{:keys [path elements id read-only doc type hidden]}]
+  [{:keys [path elements id read-only doc type hidden style]}]
   [:div
    (doall
     (for [elt elements]
       [:span.form-check.form-check-inline
+       {:style style}
        [:label.form-check-label {:for id} (name elt)]
        [:input.form-check-input
         {:name id
@@ -148,7 +172,7 @@
 ;;; TODO option processing, labels/hierarchy etc.
 ;;; TODO might need to translate from none-value to nil
 (defmethod form-field :select
-  [{:keys [path read-only doc hidden? options id]}]
+  [{:keys [path read-only doc hidden? options id width]}]
   (let [disabled? false
         value @(rf/subscribe [:form-field-value path])
         dispatch #(rf/dispatch [:set-form-field-value path %])]
@@ -244,50 +268,9 @@
    (doall (map form-field-row fields))
    [:button.btn.btn-primary {:type "submit" :on-click #(action (gather-fields fields))} "Submit"]])
 
-;;; TODO integrate or flush
-
-(defmulti field-valid? :type)
-
-(defmethod field-valid? :default
-  [arg]
-  @(rf/subscribe [:form-field-value (:name arg)]))
-
-(defmethod field-valid? :string
-  [arg]
-  (not (empty? @(rf/subscribe [:form-field-value (:name arg)]))))
-
-(defmethod field-valid? :columns
-  [arg]
-  (not (empty? @(rf/subscribe [:form-field-value (:name arg)]))))
-
-(defmethod field-valid? :local-files
-  [arg]
-  (not (empty? @(rf/subscribe [:form-field-value (:name arg)]))))
-
-(defmethod field-valid? :boolean
-  [_]
-  true)                                 ;booleans are always valid
 
 
-(defmulti form-valid? :id)
 
-(defmethod form-valid? :default 
-  [{:keys [args] :as op-def}]
-  (every?
-   identity
-   (for [arg args]
-     (or (:optional? arg)
-         (field-valid? arg)))))
-
-#_
-(defmethod form-valid? :upload-files 
-  [{:keys [args] :as op-def}]
-  ;; Note: the other fields should take care of themselves
-  (let [arg (fn [n] (u/some-thing #(= (:name %) n) args))]
-    (tu/oneof
-     (field-valid? (arg :gs-path))
-     (field-valid? (arg :local-files))
-     (field-valid? (arg :local-directory)))))
 
 
 

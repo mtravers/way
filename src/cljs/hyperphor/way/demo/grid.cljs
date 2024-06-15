@@ -11,3 +11,20 @@
       data
       :col-defs {:country {:url-template "/dbpedia/%s"}}
       ])])
+
+(def datasets
+  ["https://vega.github.io/editor/data/barley.json"
+   "https://vega.github.io/editor/data/cars.json"
+   "https://vega.github.io/editor/data/jobs.json"])
+
+(defn ui-multiple
+  []
+  [:div
+   [:p "Multiple grids with different data"]
+   [:div.flex-row.d-flex
+    (doall
+     (for [url datasets]
+       (let [data (f/from-url url)]
+         [:div {:style {:height "500px" :width "500px"}}
+          [ag/ag-table 
+           data]])))]])

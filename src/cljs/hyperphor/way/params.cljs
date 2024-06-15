@@ -4,6 +4,8 @@
             [hyperphor.way.web-utils :as wu]
             ))
 
+;;; TODO data-id here is treated different than feeds.
+
 ;;; TODO integrate with form
 
 ;;; TODO maybe generalize this pattern to -before, and other event handlers. 
