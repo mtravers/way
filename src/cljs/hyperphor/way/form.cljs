@@ -8,6 +8,8 @@
 ;;; Status: carved out of traverse.ops, not yet integrated
 ;;; TODO param stuff should go through here. Or do we need both levels of abstraction?
 ;;; TODO way to supply extras or customizations
+;;; TODO should probably incorporate component library like https://mantine.dev/
+
 
 (rf/reg-sub
  :form-field-value
