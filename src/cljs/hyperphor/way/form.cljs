@@ -71,6 +71,7 @@
      [:div.col-sm-2.form-field-doc (or (form-field-warnings args) doc)]
      ]))
 
+;;; TODO propagate this to other methods. Really need :before, maybe I should switch to methodical
 (defn init?
   [path value init]
   (when (and init (not value)) (rf/dispatch [:set-form-field-value path init])))
@@ -78,8 +79,6 @@
 (defmethod form-field :default
   [{:keys [type path label id hidden? disabled? value-fn style init] :as args :or {value-fn identity }}]
   (let [value @(rf/subscribe [:form-field-value path])]
-    ;; TODO propagate this to other methods. Really need :before, maybe I should switch to methodical
-    #_ (when (and init (not value)) (rf/dispatch [:set-form-field-value path init]))
     (init? path value init)
     [:input.form-control
      {:id id

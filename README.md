@@ -49,6 +49,11 @@ To run locally:
     lein shadow compile app
     lein run <port>
 
+### Notes
+
+The demo app is included in Way itself, for my personal convenience. This is a bit iffy and probably should be undone at some point.
+
+
 ## License
 
 Copyright © 2020-24 Hyperphor
