@@ -8,6 +8,8 @@
 ;;; Status: carved out of traverse.ops, not yet integrated
 ;;; TODO param stuff should go through here. Or do we need both levels of abstraction?
 ;;; TODO way to supply extras or customizations
+;;; TODO should probably incorporate component library like https://mantine.dev/
+
 
 (rf/reg-sub
  :form-field-value
@@ -69,11 +71,15 @@
      [:div.col-sm-2.form-field-doc (or (form-field-warnings args) doc)]
      ]))
 
+;;; TODO propagate this to other methods. Really need :before, maybe I should switch to methodical
+(defn init?
+  [path value init]
+  (when (and init (not value)) (rf/dispatch [:set-form-field-value path init])))
+
 (defmethod form-field :default
   [{:keys [type path label id hidden? disabled? value-fn style init] :as args :or {value-fn identity }}]
   (let [value @(rf/subscribe [:form-field-value path])]
-    ;; TODO propaget this to other methods. Really need :before, maybe I should switch to methodical
-    (when (and init (not value)) (rf/dispatch [:set-form-field-value path init]))
+    (init? path value init)
     [:input.form-control
      {:id id
       :style style
@@ -149,9 +155,11 @@
 
 ;;; See radio-button groups https://getbootstrap.com/docs/5.3/components/button-group/#checkbox-and-radio-button-groups
 (defmethod form-field :oneof
-  [{:keys [path elements id read-only doc type hidden style]}]
-  [:div
-   (doall
+  [{:keys [path elements id read-only doc type hidden style init]}]
+  (let [value @(rf/subscribe [:form-field-value path])]
+    (init? path value init)
+    [:div
+     (doall
     (for [elt elements]
       [:span.form-check.form-check-inline
        {:style style}
@@ -159,15 +167,12 @@
        [:input.form-check-input
         {:name id
          :type "radio"
-         :checked @(rf/subscribe [:form-field-value (conj path elt)])
+         :checked (= elt value)
          :disabled read-only
          :on-change (fn [e]
                       (rf/dispatch
                        [:set-form-field-value path elt]))}
-        ]]))])
-
-;;; TODO radiobuttons
-
+        ]]))]))
 
 ;;; TODO option processing, labels/hierarchy etc.
 ;;; TODO might need to translate from none-value to nil
@@ -176,7 +181,6 @@
   (let [disabled? false
         value @(rf/subscribe [:form-field-value path])
         dispatch #(rf/dispatch [:set-form-field-value path %])]
-    (prn :options options)
     (wu/select-widget id value dispatch options nil disabled?)))
 
 ;;; TODO multiselect
@@ -266,7 +270,8 @@
    #_ (when doc                            ;TODO
         [:div.alert doc])
    (doall (map form-field-row fields))
-   [:button.btn.btn-primary {:type "submit" :on-click #(action (gather-fields fields))} "Submit"]])
+   (when action
+     [:button.btn.btn-primary {:type "submit" :on-click #(action (gather-fields fields))} "Submit"])])
 
 
 

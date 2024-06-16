@@ -8,6 +8,9 @@
         "test": "test"
     },
     "dependencies": {
+        "@blocknote/core": "^0.14.1",
+        "@blocknote/mantine": "^0.14.1",
+        "@blocknote/react": "^0.14.1",
         "ag-grid-community": "^31.0.1",
         "ag-grid-enterprise": "^31.0.1",
         "ag-grid-react": "^31.0.1",
@@ -15,7 +18,7 @@
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-vega": "^7.6.0",
-        "vega-lite": "^5.15.1"	
+        "vega-lite": "^5.15.1"
     },
     "devDependencies": {
         "shadow-cljs": "2.26.5"

@@ -12,6 +12,7 @@
    [hyperphor.way.demo.heatmap :as hm]
    [hyperphor.way.demo.heatmap2 :as hm2]
    [hyperphor.way.demo.violin :as vi]
+   [hyperphor.way.demo.blocknote :as bn]
    [hyperphor.way.demo.grid :as grid]
    [hyperphor.way.demo.lline :as lline]
    [hyperphor.way.demo.forms :as forms]
@@ -69,8 +70,6 @@
        (wu/spinner 1))]
     ]])
 
-;;; TODO for some reason there's an extra {} on Heroku deployed version, not local. No idea where its from!
-
 (defn app-ui
   []
   [:div
@@ -88,6 +87,7 @@
      :heatmap_basic hm/ui
      :heatmap_flex hm2/ui
      :violin vi/ui
+     :rich_text bn/main-page
      )]
    #_ [footer]
    ])

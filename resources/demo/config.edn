@@ -9,7 +9,8 @@
  :basic-auth-creds nil                  ;[name pwd]
 
  ;; Customization
- :css []
+ :css ["demo/css/node/@blocknote/mantine/dist/style.css"
+       "demo/css/node/@blocknote/core/src/fonts/inter.css"]
  :js ["demo/js/leader-line.min.js"]
 
  }
