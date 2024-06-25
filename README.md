@@ -2,19 +2,39 @@
 
 The way that can be named is not the eternal way. – Lao Tzu
 
-A base for building data-oriented websites it Clojure, ClojureScript, and Vega.
+A base for building data-oriented websites it Clojure, ClojureScript, and Vega. Does nothing especially new or fancy, just brings what I need together in one place.
 
 [Demo site](https://shrouded-escarpment-03060-744eda4cc53f.herokuapp.com/)
 
 
 ## Features
 
-- Web infrastructure
+- General web infrastructure
 - Web utilities (spinners, modals, forms, etc)
+- Data fetching 
+
 - Vega tooling for clustered heatmaps
 - Vega tooling for violin diagrams
 - Ag-grid wrapping for data tables
+- Rich text editor
 
+## Users
+
+Way demo
+Wayne (PICI/Stanford BRUCE Portal)
+Traverse (CDD)
+MGen 2.0 (CDD)
+
+
+## TODO
+
+These are some of the more glaring current deficiencies
+
+- Resource management, hard to integrate way and apps
+- Flesh out form abstraction, useable as object editor/viewer
+- SPA navigation
+- Integrate static HTML forms with SPA/react forms
+- Need to include a real modern react component library
 
 ## Clustered Heatmaps
 

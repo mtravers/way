@@ -121,6 +121,7 @@
   [app-site-routes]
   (-> (routes app-site-routes base-site-routes)
       (wrap-restful-response)
+      ;; TODO isn't this redundant with middleware-site-defaults?
       (resource/wrap-resource "public" {:allow-symlinks? true}) ;allow symlinks in static dir
       (middleware/wrap-defaults site-defaults)                                  ;TODO turn off static thing in here
       wrap-no-read-eval

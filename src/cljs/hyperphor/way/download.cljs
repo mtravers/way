@@ -1,10 +1,5 @@
 (ns hyperphor.way.download
   (:require [clojure.string :as str]
-            [re-frame.core :as rf]
-            [re-frame.db :as rf-db]
-            [cemerick.url :as url]
-            #_ cljs-time.format
-            #_ cljs-time.coerce
             )
   )
 
