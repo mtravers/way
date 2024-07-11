@@ -184,9 +184,7 @@
 (defn app
   [app-site-routes app-api-routes]
   (let [base (routes (api-routes app-api-routes) (site-routes app-site-routes))]
-    (if (and (config/config :basic-auth)
+    (if (and (config/config :basic-auth) ;TODO just use :basic-auth-creds and eliminate this extra var
              (not (config/config :dev-mode)))
       (wrap-basic-authentication base authenticated?)
       base)))
-
-

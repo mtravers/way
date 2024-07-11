@@ -37,5 +37,8 @@
   (GET "/dbpedia/:id" [id] (dbpedia-view id) )
   )
 
-(def app (wh/app site-routes (routes)))
+;;; Warning. Do not use "(def app ...)", config isn't necessarily right at compile time
+(defn app
+  []
+  (wh/app site-routes (routes)))
 

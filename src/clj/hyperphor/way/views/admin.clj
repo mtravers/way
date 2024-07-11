@@ -35,4 +35,4 @@
       (map-table "System/getenv" (System/getenv))
       (map-table "HTTP req" req)
       ])
-    (throw (ex-info "Dev mode onlye"))))
+    (throw (ex-info "Dev mode only" {:req req}))))
