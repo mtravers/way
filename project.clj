@@ -21,6 +21,7 @@
                  [ring-basic-authentication "1.2.0"]
                  [ring-logger "1.1.1"]
                  [ring-middleware-format "0.7.5" :exclusions [javax.xml.bind/jaxb-api]]
+                 [ring-oauth2 "0.1.4"]
 
                  ;; Data
                  [clj-http "3.13.0" :exclusions [commons-io]]

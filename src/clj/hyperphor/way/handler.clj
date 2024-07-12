@@ -6,6 +6,7 @@
             [ring.middleware.basic-authentication :refer [wrap-basic-authentication]]
             [org.candelbio.multitool.core :as u]
             [org.candelbio.multitool.cljcore :as ju]
+            [hyperphor.way.oauth :as oauth]
             [hyperphor.way.views.html :as html]
             [hyperphor.way.views.admin :as admin]
             [hyperphor.way.data :as data]
@@ -47,8 +48,25 @@
     (html/html-frame-spa))
    "text/html"))
 
+(defn login-view
+  []
+  (html/html-frame
+   {:page :login}                       ;TODO this has changed
+   "Login"
+   [:div.black
+    [:div.login-panel.p-4
+     [:table
+      [:tr
+       [:td
+        [:h4 "Welcome to RawSugar, PICI's raw data handling tool."]] ;TODO config
+       [:td
+        [:div {:style (html/style-arg {:margin-left "60px"}) }
+         [:a {:href "/oauth2/google"}
+          [:img {:src "/img/google-signin.png"}]]]]]]]]))
+
 (defroutes base-site-routes
   (GET "/" [] (spa))                    ;index handled by spa
+  (GET "/login" [] (login-view)) ;TODO only if OAuth configured
   (GET "/admin" req (admin/view req))
   #_ (GET "*" [] (spa))                    ;default is handled by spa
   (route/not-found "Not found")
@@ -121,6 +139,9 @@
   [app-site-routes]
   (-> (routes app-site-routes base-site-routes)
       (wrap-restful-response)
+
+      (oauth/wrap-oauth)
+
       ;; TODO isn't this redundant with middleware-site-defaults?
       (resource/wrap-resource "public" {:allow-symlinks? true}) ;allow symlinks in static dir
       (middleware/wrap-defaults site-defaults)                                  ;TODO turn off static thing in here
