@@ -1,4 +1,4 @@
-(defproject hyperphor/way "0.1.1-SNAPSHOT" ;TODO have to change deploy.sh when version changes
+(defproject hyperphor/way "0.1.2-SNAPSHOT" ;TODO have to change deploy.sh when version changes
   :description "Way"
   :url "https://shrouded-escarpment-03060-744eda4cc53f.herokuapp.com/"
   :license {:name "EPL-2.0"

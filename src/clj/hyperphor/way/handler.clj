@@ -58,7 +58,8 @@
      [:table
       [:tr
        [:td
-        [:h4 "Welcome to RawSugar, PICI's raw data handling tool."]] ;TODO config
+        [:h4 (or (config/config :oauth :signin-text)
+                 (config/config :app-title))]]
        [:td
         [:div {:style (html/style-arg {:margin-left "60px"}) }
          [:a {:href "/oauth2/google"}
@@ -67,6 +68,9 @@
 (defroutes base-site-routes
   (GET "/" [] (spa))                    ;index handled by spa
   (GET "/login" [] (login-view)) ;TODO only if OAuth configured
+  (GET "/authenticated" req           ;on mgen, its /callback or somesuch
+       (let [original-page (get-in req [:cookies "way_landing" :value])] ;TODO
+         (response/redirect (if (empty? original-page) "/" original-page))))
   (GET "/admin" req (admin/view req))
   #_ (GET "*" [] (spa))                    ;default is handled by spa
   (route/not-found "Not found")

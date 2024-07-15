@@ -11,29 +11,28 @@
   (:import [org.apache.commons.codec Charsets]
            [org.apache.commons.codec.binary Base64]))
 
-;;; Mostly based on Rawsugar. It is so stupid that there isn't an easy to use library for this...
+;;; It is so stupid that there isn't an easy to use library for this...
 
-;;; TODO Make the rest of this configurable so usable with other than google
+;;; TODO Make the rest of this configurable so usable with providers other than google
 (defn oauth2-params
   []
   {:google
    {:authorize-uri    "https://accounts.google.com/o/oauth2/auth"
-   :access-token-uri "https://accounts.google.com/o/oauth2/token"
-   :client-id        (config/config :oauth :client-id)
-   :client-secret    (config/config :oauth :client-secret)
-   :scopes           ["https://www.googleapis.com/auth/userinfo.email"]
-   :launch-uri       "/oauth2/google"
-   :redirect-uri     (config/config :oauth :callback)
-   :landing-uri      "/authenticated"
-   }})
+    :access-token-uri "https://accounts.google.com/o/oauth2/token"
+    :client-id        (config/config :oauth :client-id)
+    :client-secret    (config/config :oauth :client-secret)
+    :scopes           ["https://www.googleapis.com/auth/userinfo.email"]
+    :launch-uri       "/oauth2/google"
+    :redirect-uri     (config/config :oauth :callback)
+    :landing-uri      "/authenticated"
+    }})
 
 ;;; Urls that do not require login. 
 (def open-uris #{"/oauth2/google"
                  "/oauth2/google/callback"
                  "/login"
-                 #_ "/css/rawsugar2.css"        ;TODO find a way to do all static files
-                 #_ "/img/Header 1.png"
                  "/img/google-signin.png"
+                 ;; TODO configurable and/or have a subdir of resources/public
                  })
 
 (defn base64-json->
@@ -74,8 +73,8 @@
     {:as :json
      :form-params {:code code
                    :redirect_uri "urn:ietf:wg:oauth:2.0:oob"
-                   :client_id (:desktop-oauth-client-id (config/config))
-                   :client_secret (:desktop-oauth-client-secret (config/config))
+                   :client_id (config/config :oauth :client-id)
+                   :client_secret (config/config :oauth :client-secret)
                    :scope ""
                    :grant_type "authorization_code" }})))
 
@@ -99,7 +98,6 @@
 (defn wrap-enforce-login
   [handler responder]
   (fn [request]
-    (prn :w-e-l request)
     (let [oauth-email (if *oauth?* 
                         (get-in request [:oauth2/claims :email])
                         (or (env/env :email)
@@ -122,15 +120,17 @@
 
 (defn wrap-oauth
   [handler]
-  (-> handler
-      (wrap-enforce-login (fn [req]
-                            (response/set-cookie
-                             (response/redirect "/login")
-                             "rawsugar_landing" ;TODO
-                             (:uri req) ;TODO this leaves out query params, see enflame for better way (but rawsugar does not actually use query params)
-                             {:same-site :lax :path "/"}
-                             )))
-      wrap-jwt                                  ;has to come before (that is, after) wrap-oauth2
-      (wrap-oauth2 (oauth2-params))
-      wrap-oauth-code
-      ))
+  (if (config/config :oauth :client-id)
+    (-> handler
+        (wrap-enforce-login (fn [req]
+                              (response/set-cookie
+                               (response/redirect "/login")
+                               "way_landing" 
+                               (:uri req) ;TODO this leaves out query params, see enflame for better way
+                               {:same-site :lax :path "/"}
+                               )))
+        wrap-jwt                                  ;has to come before (that is, after) wrap-oauth2
+        (wrap-oauth2 (oauth2-params))
+        wrap-oauth-code
+        )
+    handler))
