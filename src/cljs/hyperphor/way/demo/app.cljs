@@ -40,7 +40,8 @@
      [:li [:<> "Web utilities (spinners, modals, forms, etc)"]]
      [:li [:<> "Vega tooling for clustered heatmaps"]]
      [:li [:<> "Vega tooling for violin diagrams"]]
-     [:li [:<> "Ag-grid wrapping for data tables"]]]
+     [:li [:<> "Ag-grid wrapping for data tables"]]
+     [:li [:<> "OAuth support"]]]
     [:h2 {:id "clustered-heatmaps"} "Clustered Heatmaps"]
     [:figure.image [:img {:src "https://raw.githubusercontent.com/mtravers/way/main/doc/assets/heatmap.png", :alt "" :style {:max-width  "500px"}}] ]
     [:p

@@ -9,13 +9,7 @@
  ;; Security
  :dev-mode false
  :basic-auth-creds nil                  ;[name pwd]
-
- :oauth {
-         :client-id #env OAUTH_CLIENT_ID
-         :client-secret #env OAUTH_SECRET
-         :callback #env OAUTH_CALLBACK  ; "https://<host>/oauth2/google/callback"
-         :signin-text "Welcom to Way"
-         }
+ :oauth false
 
  ;; Customization
  :css ["demo/css/node/@blocknote/mantine/dist/style.css"
