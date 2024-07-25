@@ -1,6 +1,5 @@
 (ns hyperphor.way.cutils
   (:require [clojure.string :as str]
-            [cemerick.url :as url]
             [clojure.string :as str]
             [org.candelbio.multitool.core :as u]
             )
@@ -26,3 +25,10 @@
     :data-toggle "tooltip"
     :title tooltip}
    icon])
+
+#?(:clj
+   (defn style-arg
+     [m]
+     (str/join (map (fn [[p v]] (format "%s: %s;" (name p) v)) m))))
+
+;;; cljs doesn need this at all

@@ -41,7 +41,7 @@
 ;;; this might fix https://codepen.io/ppolyzos/pen/AWKgOv
 (defmethod form-field-ro :textarea
   [{:keys [value max-height] :or {max-height "240px"}}]
-  [:div.withlinebreaks.overflow-auto {:style (wu/style-arg {:max-height max-height})} value])
+  [:div.withlinebreaks.overflow-auto {:style (cu/style-arg {:max-height max-height})} value])
 
 ;;; Note: not actually specialized at all, so maybe doesnt need to be a method
 (defmulti form-field-row (fn [{:keys [type path label id hidden? disabled? doc] :as args}]
