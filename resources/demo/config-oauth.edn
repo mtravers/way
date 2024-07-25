@@ -1,0 +1,11 @@
+;;; Config for oauth testing.
+
+#merge
+[#include "config.edn"
+ {:oauth
+  {:client-id #env OAUTH_CLIENT_ID
+   :client-secret #env OAUTH_SECRET
+   :callback #env OAUTH_CALLBACK  ; "https://<host>/oauth2/google/callback"
+   :signin-text "Welcom to Way"
+   }
+  }]

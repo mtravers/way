@@ -1,3 +1,5 @@
+;;; Way config. Read via Aero https://github.com/juxt/aero which supports #env
+
 {
  ;; Idenitty
  :app-title "Way demo with Clustered Heatmaps"
@@ -7,6 +9,7 @@
  ;; Security
  :dev-mode false
  :basic-auth-creds nil                  ;[name pwd]
+ :oauth false
 
  ;; Customization
  :css ["demo/css/node/@blocknote/mantine/dist/style.css"

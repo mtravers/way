@@ -103,4 +103,4 @@
 
 (defmethod fetch :default
   [data-id]
-  (rf/dispatch [:fetch data-id]))
+  (rf/dispatch [:fetch [data-id]]))

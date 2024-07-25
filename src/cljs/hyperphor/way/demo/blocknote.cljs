@@ -8,6 +8,10 @@
             [hyperphor.way.form :as wf]
             ))
 
+;;; Demo integration of Blocknote https://www.blocknotejs.org/
+;;; For an alternative, see Slate: https://github.com/ianstormtaylor/slate
+
+
 (def blocknote-adapter (reagent/adapt-react-class bn/BlockNoteView))
 
 (def some-markdown

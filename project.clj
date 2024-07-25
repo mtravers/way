@@ -1,4 +1,4 @@
-(defproject hyperphor/way "0.1.1-SNAPSHOT" ;TODO have to change deploy.sh when version changes
+(defproject hyperphor/way "0.1.2-SNAPSHOT" ;TODO have to change deploy.sh when version changes
   :description "Way"
   :url "https://shrouded-escarpment-03060-744eda4cc53f.herokuapp.com/"
   :license {:name "EPL-2.0"
@@ -21,6 +21,7 @@
                  [ring-basic-authentication "1.2.0"]
                  [ring-logger "1.1.1"]
                  [ring-middleware-format "0.7.5" :exclusions [javax.xml.bind/jaxb-api]]
+                 [ring-oauth2 "0.1.4"]
 
                  ;; Data
                  [clj-http "3.13.0" :exclusions [commons-io]]

@@ -6,8 +6,10 @@
             [ring.middleware.basic-authentication :refer [wrap-basic-authentication]]
             [org.candelbio.multitool.core :as u]
             [org.candelbio.multitool.cljcore :as ju]
+            [hyperphor.way.oauth :as oauth]
             [hyperphor.way.views.html :as html]
             [hyperphor.way.views.admin :as admin]
+            [hyperphor.way.views.login :as login]
             [hyperphor.way.data :as data]
             [hyperphor.way.config :as config]
             [ring.logger :as logger]
@@ -49,6 +51,10 @@
 
 (defroutes base-site-routes
   (GET "/" [] (spa))                    ;index handled by spa
+  (GET "/login" [] (login/login-view)) ;TODO only if OAuth configured
+  (GET "/authenticated" req           ;on mgen, its /callback or somesuch
+       (let [original-page (get-in req [:cookies "way_landing" :value])] ;TODO
+         (response/redirect (if (empty? original-page) "/" original-page))))
   (GET "/admin" req (admin/view req))
   #_ (GET "*" [] (spa))                    ;default is handled by spa
   (route/not-found "Not found")
@@ -121,6 +127,10 @@
   [app-site-routes]
   (-> (routes app-site-routes base-site-routes)
       (wrap-restful-response)
+
+      (oauth/wrap-oauth)
+
+      ;; TODO isn't this redundant with middleware-site-defaults?
       (resource/wrap-resource "public" {:allow-symlinks? true}) ;allow symlinks in static dir
       (middleware/wrap-defaults site-defaults)                                  ;TODO turn off static thing in here
       wrap-no-read-eval
@@ -183,9 +193,7 @@
 (defn app
   [app-site-routes app-api-routes]
   (let [base (routes (api-routes app-api-routes) (site-routes app-site-routes))]
-    (if (and (config/config :basic-auth)
+    (if (and (config/config :basic-auth) ;TODO just use :basic-auth-creds and eliminate this extra var
              (not (config/config :dev-mode)))
       (wrap-basic-authentication base authenticated?)
       base)))
-
-
