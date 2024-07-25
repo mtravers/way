@@ -1,5 +1,6 @@
 (ns hyperphor.way.params
   (:require [re-frame.core :as rf]
+            [hyperphor.way.cutils :as cu]
             [hyperphor.way.feeds :as f]
             [hyperphor.way.web-utils :as wu]
             ))
@@ -75,7 +76,7 @@
    #(rf/dispatch [:set-param data-id param-id %])
    ;; TODO this breaks :optgroups
    (map (fn [v]
-          {:value v :label (if v (wu/humanize v)  "---")})
+          {:value v :label (if v (cu/humanize v)  "---")})
         values)
    nil
    nil

@@ -1,6 +1,6 @@
 (ns hyperphor.way.tabs
   (:require [re-frame.core :as rf]
-            [hyperphor.way.web-utils :as wu]
+            [hyperphor.way.cutils :as cu]
    ))
 
 ;;; manages any kind of tabbed ui, or top level pages
@@ -23,7 +23,7 @@
          (if name
            [:a.nav-link {:class (when (= name active) "active")
                          :on-click #(rf/dispatch [:choose-tab id name])}
-            (wu/humanize name)]
+            (cu/humanize name)]
            [:a.nav-link.disabled.vtitle view])])]
      (when active
        ((tabs active)))]))

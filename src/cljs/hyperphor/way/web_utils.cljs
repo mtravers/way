@@ -3,22 +3,13 @@
             [re-frame.core :as rf]
             [re-frame.db :as rf-db]
             [cemerick.url :as url]
+            [hyperphor.way.cutils :as cu]
             [org.candelbio.multitool.core :as u]
-            #_ cljs-time.format
-            #_ cljs-time.coerce
             )
   )
 
 ;;; Web utils
 
-;;; Generalize?
-;;; CLJC
-(defn humanize
-  [term]
-  (when term
-    (-> term
-        name
-        (str/replace "_" " "))))
 
 ;;; ⦿⦾⦿ local storage (browser) ⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿⦾⦿
 
@@ -30,19 +21,9 @@
   [key value]
   (.setItem js/localStorage key value))
 
-;;; See https://material.io/resources/icons/
-(defn icon
-  [icon tooltip handler & {:keys [class disabled?] :or {class "md-dark"}}]
-  [:i.icon.material-icons.vcenter
-   {:class (str/join " " (list class (if disabled? "md-inactive" "")))
-    :on-click handler
-    :data-toggle "tooltip"
-    :title tooltip}
-   icon])
-
 (defn doc-icon
   [url & [popup]]
-  (icon
+  (cu/icon
    "help_outline"
    (or popup "documentation")
    #(.open js/window url "_doc")))
@@ -147,10 +128,10 @@ setter #(let [value @(rf/subscribe [::edited-value key])]
                          (when (= "Enter" (.-key evt))
                            (setter)))
          }]
-       (icon "done" "save" setter :class "md-light")
-       (icon "cancel" "cancel" #(rf/dispatch [::edit key false]) :class "md-light")])
+       (cu/icon "done" "save" setter :class "md-light")
+       (cu/icon "cancel" "cancel" #(rf/dispatch [::edit key false]) :class "md-light")])
     [:span normal-class (normal)
-     (icon "create" "edit" #(do
+     (cu/icon "create" "edit" #(do
                               (rf/dispatch [::set-edited-value key initial-value])
                               (rf/dispatch [::edit key true]))
             :class "md-light")]))
@@ -223,14 +204,14 @@ setter #(let [value @(rf/subscribe [::edited-value key])]
                        (rf/dispatch [::set-edited-value key new-value])))
         :style {:width "90%"}
         }]
-      (icon "done" "save" #(do (change-fn @(rf/subscribe [::edited-value key]))
+      (cu/icon "done" "save" #(do (change-fn @(rf/subscribe [::edited-value key]))
                                (rf/dispatch [::edit key false]))
             :class "md-light")
-      (icon "cancel" "cancel" #(rf/dispatch [::edit key false])
+      (cu/icon "cancel" "cancel" #(rf/dispatch [::edit key false])
             :class "md-light")]
      [:div.editable-text
       (or initial-value [:i {:style {:color "gray"}} "no value"])
-      (icon "create" "edit" #(do
+      (cu/icon "create" "edit" #(do
                                (rf/dispatch [::set-edited-value key initial-value])
                                (rf/dispatch [::edit key true]))
             :class "md-light")])])
@@ -275,15 +256,6 @@ setter #(let [value @(rf/subscribe [::edited-value key])]
                                               :border-width (str (/ size 10.0) "em")}}
      ]))
 
-;;; For ops form, here because its used in both project and batch pages.
-(defn form-row
-  [label content]
-  [:tr
-   [:th {:style {:width "150px"}} label]
-   [:td
-    content]
-   [:td ""]                             ;doc or other infor column
-   ])
 
 (defn open-in-browser-tab
   [url name]
