@@ -9,6 +9,7 @@
             [hyperphor.way.oauth :as oauth]
             [hyperphor.way.views.html :as html]
             [hyperphor.way.views.admin :as admin]
+            [hyperphor.way.views.login :as login]
             [hyperphor.way.data :as data]
             [hyperphor.way.config :as config]
             [ring.logger :as logger]
@@ -48,26 +49,9 @@
     (html/html-frame-spa))
    "text/html"))
 
-(defn login-view
-  []
-  (html/html-frame
-   {:page :login}                       ;TODO this has changed
-   "Login"
-   [:div.black
-    [:div.login-panel.p-4
-     [:table
-      [:tr
-       [:td
-        [:h4 (or (config/config :oauth :signin-text)
-                 (config/config :app-title))]]
-       [:td
-        [:div {:style (html/style-arg {:margin-left "60px"}) }
-         [:a {:href "/oauth2/google"}
-          [:img {:src "/img/google-signin.png"}]]]]]]]]))
-
 (defroutes base-site-routes
   (GET "/" [] (spa))                    ;index handled by spa
-  (GET "/login" [] (login-view)) ;TODO only if OAuth configured
+  (GET "/login" [] (login/login-view)) ;TODO only if OAuth configured
   (GET "/authenticated" req           ;on mgen, its /callback or somesuch
        (let [original-page (get-in req [:cookies "way_landing" :value])] ;TODO
          (response/redirect (if (empty? original-page) "/" original-page))))

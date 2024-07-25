@@ -17,6 +17,7 @@ A base for building data-oriented websites it Clojure, ClojureScript, and Vega. 
 - Vega tooling for violin diagrams
 - Ag-grid wrapping for data tables
 - Rich text editor
+- OAuth supprt
 
 ## Users
 
@@ -25,16 +26,6 @@ Wayne (PICI/Stanford BRUCE Portal)
 Traverse (CDD)
 MGen 2.0 (CDD)
 
-
-## TODO
-
-These are some of the more glaring current deficiencies
-
-- Resource management, hard to integrate way and apps
-- Flesh out form abstraction, useable as object editor/viewer
-- SPA navigation
-- Integrate static HTML forms with SPA/react forms
-- Need to include a real modern react component library
 
 ## Clustered Heatmaps
 
