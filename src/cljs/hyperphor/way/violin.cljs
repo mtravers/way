@@ -1,5 +1,6 @@
 (ns hyperphor.way.violin
   (:require [hyperphor.way.vega :as v]
+            [hyperphor.way.cutils :as cu]
             [hyperphor.way.web-utils :as wu]
             )
   )
@@ -44,7 +45,7 @@
 
      :config {:axisBand {:bandPosition 1, :tickExtra true, :tickOffset 0}},
      :axes
-     [{:orient "bottom", :scale "xscale", :zindex 1, :title (wu/humanize feature)} ;TODO want metacluster in this
+     [{:orient "bottom", :scale "xscale", :zindex 1, :title (cu/humanize feature)} ;TODO want metacluster in this
       {:orient "left", :scale "layout", :tickCount 5, :zindex 1}],
 
      :scales

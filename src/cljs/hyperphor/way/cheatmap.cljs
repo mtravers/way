@@ -3,7 +3,7 @@
             [hyperphor.way.cluster :as cluster]
             [org.candelbio.multitool.core :as u]
             [org.candelbio.multitool.math :as um]
-            [hyperphor.way.web-utils :as wu]
+            [hyperphor.way.cutils :as cu]
             )
   )
 
@@ -155,13 +155,13 @@
                              :height {:signal "hm_height"}
                              :fill {:value "#ccc"}}} ;TODO parameter, also see cell-gap
            :axes
-           [{:orient :right :scale :sy :domain false :title (wu/humanize h-field)} 
-            {:orient :bottom :scale :sx :labelAngle 90 :labelAlign "left" :labelBaseline :middle :domain false :title (wu/humanize v-field)}]
+           [{:orient :right :scale :sy :domain false :title (cu/humanize h-field)} 
+            {:orient :bottom :scale :sx :labelAngle 90 :labelAlign "left" :labelBaseline :middle :domain false :title (cu/humanize v-field)}]
 
            :legends
            [{:fill :color
              :type :gradient
-             :title (wu/humanize value-field)
+             :title (cu/humanize value-field)
              :titleOrient "bottom"
              :gradientLength {:signal "hm_height / 2"} ;TODO not always right
              }]
