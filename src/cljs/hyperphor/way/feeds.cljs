@@ -37,7 +37,6 @@
                        event-params
                        {:data-id data-key} ;TODO fix terminology to be consistent
                        )]
-     (prn :data-fetch params)
      (api/api-get
       "/data"
       {:params params
@@ -65,7 +64,7 @@
  :fetch-once
  (fn [db [_ data-id]]
    (when-not (get-in db [:data data-id])
-     (rf/dispatch [:fetch data-id]))))
+     (rf/dispatch [:fetch data-id]))))  ;TODO seems wrong? it shoudl be [:fetch [data-id]] I think?
 
 (rf/reg-sub
  :data

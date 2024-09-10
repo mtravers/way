@@ -91,7 +91,6 @@
       ;; TODO
       #_ :on-key-press #_ (fn [evt]
                             (when (= "Enter" (.-key evt))
-                              (prn :enter path)
                               nil))
       }]))
 

@@ -111,7 +111,7 @@
                      )
            :range {:step cell-size}} 
           {:name "color"
-           :type "linear"
+           :type "symlog"
            :range {:scheme color-scheme}
            :domain {:data "hm" :field value-field}
            }]

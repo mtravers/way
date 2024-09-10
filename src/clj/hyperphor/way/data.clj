@@ -73,7 +73,6 @@
 
 
 (defmulti data (fn [{:keys [data-id] :as params}]
-                 (prn :x data-id)
                  (keyword data-id)))
 
 (defmethod data :default

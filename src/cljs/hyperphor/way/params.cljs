@@ -19,7 +19,6 @@
 ;;; Causes a new data fetch. TODO not always desired, need some flex here
 (defn set-param
   [db [_ data-id param value :as msg]]
-  (prn :set-param data-id param value)
   (f/fetch data-id)                     ;TODO more sophisticated mechanism
   (set-param-after db msg)
   (-> (if (vector? param)                  ;? smell
@@ -34,7 +33,6 @@
 (rf/reg-event-db
  :set-param-if
  (fn [db [_ data-id param value :as msg]]
-   (prn :set-param-if data-id param value)
    (if (if (vector? param)
          (get-in db (concat [:params data-id] param))
          (get-in db [:params data-id param]))
@@ -93,23 +91,22 @@
             (not (empty? v)))
           (update [evt]
             (let [v (-> evt .-target .-value)]
-              (prn :update v (valid? v))
               (when (valid? v)
                 (rf/dispatch [:set-param data-id param-id v]))))]
     
     [:span.parameter
      [:input.selector.form-control
       {:type "url"
-       :id "fuckme"
+       :id "foo"
        :style {:display "inline-block"
                :width #_ "500px" "100%"}
        :list (name param-id)
-       ;; :on-click #(do (prn :fuck-me %) (set! (.-value (-> % .-target)) ""))
+       ;; :on-click #(do (set! (.-value (-> % .-target)) ""))
        :on-blur update
        :on-select update
        }]
      [:button.btn.btn-secondary
-      {:on-click  #(let [elt (.getElementById js/document "fuckme")] (prn :fuck-me elt) (set! (.-value elt) "")) #_ #(rf/dispatch [:set-param data-id param-id ""])} "Clear" ]
+      {:on-click  #(let [elt (.getElementById js/document "foo")]  (set! (.-value elt) "")) #_ #(rf/dispatch [:set-param data-id param-id ""])} "Clear" ]
      [:datalist {:id (name param-id) } (wu/select-widget-options values nil)]]
     ))
 

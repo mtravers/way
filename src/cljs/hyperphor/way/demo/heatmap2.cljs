@@ -12,6 +12,10 @@
    "https://vega.github.io/editor/data/gapminder.json"
    [:year :country :fertility {:cluster-rows? false}]
 
+   ;; TODO – requires: symlog scale, more space for trees, labels, and the clustering still seems off
+   #_"https://raw.githubusercontent.com/colinmorris/pejorative-compounds/master/counts.csv"
+   #_ [:pre :suff :count {}]
+
    "https://vega.github.io/editor/data/barley.json"
    [:site :variety :yield { :aggregate :mean}]
    "https://vega.github.io/editor/data/movies.json" [:Distributor (keyword "Major Genre") (keyword "US Gross")]

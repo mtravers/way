@@ -273,3 +273,10 @@ setter #(let [value @(rf/subscribe [::edited-value key])]
 
 
 
+;;; TODO here for back compatibility, should be replaced with version in cutils
+(defn humanize
+  [term]
+  (when term
+    (-> term
+        name
+        (str/replace "_" " "))))

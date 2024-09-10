@@ -23,6 +23,10 @@
 
 (def vega-adapter (reagent/adapt-react-class rv/Vega))
 
+;;; To implement click handling, you need something like this in :signals
+;;;     {:name "click"
+;;;      :on [{:events "symbol:click" :update "datum"}]}
+
 (defn vega-view
   [spec data]
   (when data
