@@ -1,0 +1,3 @@
+* 25 July
+
+Made a releasable version (1.3) but it is too big for Clojars
