@@ -35,25 +35,29 @@
                  [reagent "1.2.0"]
                  [re-frame "1.4.3"]
                  [com.cemerick/url "0.1.1"]
+                 ;; TODO for navigation when that works
+                 ;; [bidi "2.1.6"]     
+                 ;; [kibu/pushy "0.3.8"]
                  [cljs-ajax "0.8.4"]
                  [day8.re-frame/tracing "0.6.2"]      ;TODO dev only
                  [day8.re-frame/re-frame-10x "1.9.9"] ;TODO dev only
 
                  ]
-  :main ^:skip-aot com.hyperphor.way.demo.core
   :source-paths ["src/cljc" "src/clj" "src/cljs"] 
   :clean-targets ^{:protect false} ["target" ".shadow-cljs" "resources/public/cljs-out"]
-  :repl-options {:init-ns com.hyperphor.way.demo.core}
 
-  :profiles {:uberjar {:aot :all
+  :profiles {:uberjar {;; :aot [com.hyperphor.way.demo.core]
                        :omit-source true
-                       :prep-tasks [["shadow" "release" "app"] "javac" "compile"] ;NOTE if you omit the javac compile items, :aot stops working!
-                       :resource-paths ["resources"]
-                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}}
+                       :prep-tasks [["shadow" "release" "npm"]] ;NOTE if you omit the javac compile items, :aot stops working!  "javac" "compile"
+                       ;; TEMP removed to try to shrink jar file
+                       ;; :resource-paths ["resources"]
+                       :resource-paths [] ;does nothing, sigh
+                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]
+                       }}
 
   :shadow-cljs {:lein true
-                :builds
-                {:app {:target :browser
+                #_ :builds
+                #_ {:app {:target :browser
                        :compiler-options {:infer-externs true}
                        :output-dir "resources/public/cljs-out"
                        :asset-path "/cljs-out"         ;webserver path
