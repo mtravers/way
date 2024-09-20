@@ -1,4 +1,4 @@
-(defproject hyperphor/way "0.1.3" ;TODO have to change deploy.sh when version changes
+(defproject com.hyperphor/way "0.1.4" ;TODO have to change deploy.sh when version changes
   :description "Way"
   :url "https://shrouded-escarpment-03060-744eda4cc53f.herokuapp.com/"
   :license {:name "EPL-2.0"
@@ -35,29 +35,32 @@
                  [reagent "1.2.0"]
                  [re-frame "1.4.3"]
                  [com.cemerick/url "0.1.1"]
+                 ;; TODO for navigation when that works
+                 ;; [bidi "2.1.6"]     
+                 ;; [kibu/pushy "0.3.8"]
                  [cljs-ajax "0.8.4"]
                  [day8.re-frame/tracing "0.6.2"]      ;TODO dev only
                  [day8.re-frame/re-frame-10x "1.9.9"] ;TODO dev only
 
                  ]
-  :main ^:skip-aot hyperphor.way.demo.core
   :source-paths ["src/cljc" "src/clj" "src/cljs"] 
   :clean-targets ^{:protect false} ["target" ".shadow-cljs" "resources/public/cljs-out"]
-  :repl-options {:init-ns hyperphor.way.demo.core}
 
-  :profiles {:uberjar {:aot :all
-                       :omit-source true
-                       :prep-tasks [["shadow" "release" "app"] "javac" "compile"] ;NOTE if you omit the javac compile items, :aot stops working!
+  :profiles {:uberjar {;; :aot [com.hyperphor.way.demo.core]
+                       ;; :omit-source true
+                       :prep-tasks [["shadow" "release" "npm"] "javac" "compile"] ;NOTE if you omit the javac compile items, :aot stops working!  "javac" "compile"
+                       ;; TEMP removed to try to shrink jar file
                        :resource-paths ["resources"]
-                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}}
+                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]
+                       }}
 
   :shadow-cljs {:lein true
-                :builds
-                {:app {:target :browser
+                #_ :builds
+                #_ {:app {:target :browser
                        :compiler-options {:infer-externs true}
                        :output-dir "resources/public/cljs-out"
                        :asset-path "/cljs-out"         ;webserver path
-                       :modules {:dev-main {:entries [hyperphor.way.demo.app]}}
+                       :modules {:dev-main {:entries [com.hyperphor.way.demo.app]}}
                        :devtools {:preloads [day8.re-frame-10x.preload.react-18]}
                        :dev {:compiler-options
                              {:closure-defines
