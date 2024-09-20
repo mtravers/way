@@ -47,11 +47,10 @@
   :clean-targets ^{:protect false} ["target" ".shadow-cljs" "resources/public/cljs-out"]
 
   :profiles {:uberjar {;; :aot [com.hyperphor.way.demo.core]
-                       :omit-source true
-                       :prep-tasks [["shadow" "release" "npm"]] ;NOTE if you omit the javac compile items, :aot stops working!  "javac" "compile"
+                       ;; :omit-source true
+                       :prep-tasks [["shadow" "release" "npm"] "javac" "compile"] ;NOTE if you omit the javac compile items, :aot stops working!  "javac" "compile"
                        ;; TEMP removed to try to shrink jar file
-                       ;; :resource-paths ["resources"]
-                       :resource-paths [] ;does nothing, sigh
+                       :resource-paths ["resources"]
                        :jvm-opts ["-Dclojure.compiler.direct-linking=true"]
                        }}
 
