@@ -3,6 +3,7 @@
             [ring.middleware.oauth2 :refer [wrap-oauth2]]
             [ring.util.response :as response]
             [clojure.string :as str]
+            [clojure.set :as set]
             [clojure.data.json :as json]
             [environ.core :as env]
             [org.candelbio.multitool.core :as u]
@@ -28,12 +29,14 @@
     }})
 
 ;;; Urls that do not require login. 
-(def open-uris #{"/oauth2/google"
-                 "/oauth2/google/callback"
-                 "/login"
-                 "/img/google-signin.png"
-                 ;; TODO configurable and/or have a subdir of resources/public
-                 })
+;;; Also used by basic-auth code
+(def open-uris (set/union
+                #{"/oauth2/google"
+                  "/oauth2/google/callback"
+                  "/login"
+                  "/img/google-signin.png"
+                  }
+                (env/env :open-uris)))
 
 (defn base64-json->
   [base64-str]

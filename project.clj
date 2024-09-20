@@ -1,8 +1,5 @@
-(defproject com.hyperphor/way "0.1.4" ;TODO have to change deploy.sh when version changes
+(defproject com.hyperphor/way "0.1.5" 
   :description "Way"
-  :url "https://shrouded-escarpment-03060-744eda4cc53f.herokuapp.com/"
-  :license {:name "EPL-2.0"
-            :url "https://www.eclipse.org/legal/epl-2.0/"}
   :deploy-repositories [["clojars" {:sign-releases false}]]
   :plugins [[lein-shadow "0.4.1"]]
   :dependencies [[org.clojure/clojure "1.11.3"]

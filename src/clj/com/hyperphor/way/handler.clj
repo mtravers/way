@@ -190,10 +190,17 @@
       (wrap-filter "/api/*")            ;filter early so edn responses don't go to regular site requests
       ))
 
+(defn wrap-basic-authentication-except
+  [base]
+  (fn [request]
+    (if (oauth/open-uris (:uri request))
+      (base request)
+      ((wrap-basic-authentication base authenticated?) request))))
+
 (defn app
   [app-site-routes app-api-routes]
   (let [base (routes (api-routes app-api-routes) (site-routes app-site-routes))]
-    (if (and (config/config :basic-auth) ;TODO just use :basic-auth-creds and eliminate this extra var
+    (if (and (config/config :basic-auth-creds)
              (not (config/config :dev-mode)))
-      (wrap-basic-authentication base authenticated?)
+      (wrap-basic-authentication-except base)
       base)))
