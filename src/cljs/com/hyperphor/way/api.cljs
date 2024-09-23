@@ -30,6 +30,11 @@
 (defn ajax-post
   [uri options]
   (ajax/POST uri
+             (merge standard-ajax-options options )))
+
+(defn ajax-put
+  [uri options]
+  (ajax/PUT uri
             (merge standard-ajax-options options )))
 
 (defn api-get
@@ -38,4 +43,8 @@
 
 (defn api-post
   [uri options]
-  (ajax-post (str "/api" uri) options)) 
+  (ajax-post (str "/api" uri) options))
+
+(defn api-put
+  [uri options]
+  (ajax-put (str "/api" uri) options))
