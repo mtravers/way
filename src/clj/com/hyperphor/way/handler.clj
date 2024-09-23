@@ -193,7 +193,7 @@
 (defn wrap-basic-authentication-except
   [base]
   (fn [request]
-    (if (oauth/open-uris (:uri request))
+    (if (oauth/open-uri? (:uri request))
       (base request)
       ((wrap-basic-authentication base authenticated?) request))))
 

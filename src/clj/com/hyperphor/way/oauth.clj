@@ -5,7 +5,6 @@
             [clojure.string :as str]
             [clojure.set :as set]
             [clojure.data.json :as json]
-            [environ.core :as env]
             [org.candelbio.multitool.core :as u]
             [clj-http.client :as client]
             )
@@ -30,13 +29,19 @@
 
 ;;; Urls that do not require login. 
 ;;; Also used by basic-auth code
-(def open-uris (set/union
-                #{"/oauth2/google"
-                  "/oauth2/google/callback"
-                  "/login"
-                  "/img/google-signin.png"
-                  }
-                (env/env :open-uris)))
+(def open-uris
+  #{"/oauth2/google"
+    "/oauth2/google/callback"
+    "/login"
+    "/img/google-signin.png"
+    })
+
+(defn open-uri?
+  [uri]
+  ((set/union
+    open-uris
+    (config/config :open-uris))
+   uri))
 
 (defn base64-json->
   [base64-str]
@@ -55,7 +60,7 @@
   [handler]
   (fn [request]
     (handler
-     (if (open-uris (:uri request))  ; Open (allowed) URI
+     (if (open-uri? (:uri request))  ; Open (allowed) URI
        request
        (if-let [token (get-in request [:oauth2/access-tokens :google :id-token])]
          (let [_expires [get-in request [:oauth2/access-tokens :google :expires]]
@@ -103,10 +108,10 @@
   (fn [request]
     (let [oauth-email (if *oauth?* 
                         (get-in request [:oauth2/claims :email])
-                        (or (env/env :email)
-                            (env/env :user)
-                            (env/env :user-name)))]
-      (cond (open-uris (:uri request))  ; Open (allowed) URI
+                        (or (config/config :oath-user :email)
+                            (config/config :oath-user :user)
+                            (config/config :oath-user :user-name)))]
+      (cond (open-uri? (:uri request))  ; Open (allowed) URI
             (handler request)
             oauth-email                 ; This request is supplying identity (or simulation thereof)
             (handler (assoc-in request [:login :email] oauth-email)) ; add info to request
