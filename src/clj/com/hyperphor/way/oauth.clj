@@ -34,6 +34,7 @@
     "/oauth2/google/callback"
     "/login"
     "/img/google-signin.png"
+    "/health"
     })
 
 (defn open-uri?
