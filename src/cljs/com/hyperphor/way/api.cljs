@@ -25,17 +25,17 @@
 (defn ajax-get
   [uri options]
   (ajax/GET uri
-            (merge standard-ajax-options options )))
+            (merge standard-ajax-options options)))
 
 (defn ajax-post
   [uri options]
   (ajax/POST uri
-             (merge standard-ajax-options options )))
+             (merge standard-ajax-options options)))
 
 (defn ajax-put
   [uri options]
   (ajax/PUT uri
-            (merge standard-ajax-options options )))
+            (merge standard-ajax-options options)))
 
 (defn api-get
   [uri options]

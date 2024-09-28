@@ -30,7 +30,7 @@
 
 (defn config
   [& atts]
-  ;; TODO hopefully avoid common error of calling at compile time rather than run
+  ;; avoid common error of calling at compile time rather than run
   (assert @the-config "Config not set")
   (get-in @the-config atts))
 

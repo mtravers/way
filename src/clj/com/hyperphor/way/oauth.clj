@@ -109,9 +109,9 @@
   (fn [request]
     (let [oauth-email (if *oauth?* 
                         (get-in request [:oauth2/claims :email])
-                        (or (config/config :oath-user :email)
-                            (config/config :oath-user :user)
-                            (config/config :oath-user :user-name)))]
+                        (or (config/config :oauth-user :email)
+                            (config/config :oauth-user :user)
+                            (config/config :oauth-user :user-name)))]
       (cond (open-uri? (:uri request))  ; Open (allowed) URI
             (handler request)
             oauth-email                 ; This request is supplying identity (or simulation thereof)
