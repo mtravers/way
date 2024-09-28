@@ -202,10 +202,30 @@
       (base request)
       ((wrap-basic-authentication base authenticated?) request))))
 
+;;; This is Heroku-specific
+(defn wrap-force-ssl
+  [handler]
+  (fn [req]
+    (let [heroku-protocol (get-in req [:headers "x-forwarded-proto"])]
+      (cond (and heroku-protocol (= "https" heroku-protocol))
+            (handler req)
+            heroku-protocol
+            (response/redirect (str "https://" (:server-name req) (:uri req)))
+            :else
+            (handler req)))))
+
+(defn wrap-if
+  [route cond wrapper]
+  (if cond
+    (wrapper route)
+    route))
+
 (defn app
   [app-site-routes app-api-routes]
-  (let [base (routes (api-routes app-api-routes) (site-routes app-site-routes))]
-    (if (and (config/config :basic-auth-creds)
-             (not (config/config :dev-mode)))
-      (wrap-basic-authentication-except base)
-      base)))
+  (-> (routes (api-routes app-api-routes) (site-routes app-site-routes))
+      (wrap-if (and (config/config :basic-auth-creds)
+                    (not (config/config :dev-mode)))
+               wrap-basic-authentication-except)
+      (wrap-if (config/config [:heroku :force-ssl])
+               wrap-force-ssl)))
+
