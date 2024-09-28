@@ -102,16 +102,13 @@
          request)))))
 
 ;;; Set or bind this false to bypass oauth and use local info instead
+#_
 (def ^:dynamic *oauth?* true)
 
 (defn wrap-enforce-login
   [handler responder]
   (fn [request]
-    (let [oauth-email (if *oauth?* 
-                        (get-in request [:oauth2/claims :email])
-                        (or (config/config :oauth-user :email)
-                            (config/config :oauth-user :user)
-                            (config/config :oauth-user :user-name)))]
+    (let [oauth-email (get-in request [:oauth2/claims :email])] ;TODO removed config option here, I don't remember what it was used for...
       (cond (open-uri? (:uri request))  ; Open (allowed) URI
             (handler request)
             oauth-email                 ; This request is supplying identity (or simulation thereof)
@@ -120,6 +117,7 @@
             (responder request)         ; call the responder (which can (eg) return an error response)
             ))))
 
+#_
 (defn wrap-oauth-off
   "Include as wrapper to disable Oauth."
   [handler]

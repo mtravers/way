@@ -31,7 +31,7 @@
      {}
      "Admin"
      [:div
-      (map-table "Config" config/config)
+      (map-table "Way Config" (config/config))
       (map-table "Env" env/env)
       (map-table "System/getenv" (System/getenv))
       (map-table "HTTP req" req)

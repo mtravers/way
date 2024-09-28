@@ -226,6 +226,6 @@
       (wrap-if (and (config/config :basic-auth-creds)
                     (not (config/config :dev-mode)))
                wrap-basic-authentication-except)
-      (wrap-if (config/config [:heroku :force-ssl])
+      (wrap-if (config/config :heroku :force-ssl)
                wrap-force-ssl)))
 
