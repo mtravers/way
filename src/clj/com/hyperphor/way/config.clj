@@ -15,7 +15,7 @@
   [_ _ [s]]
   (and s (s/split s #",")))
 
-(def the-config (atom {}))
+(def the-config (atom nil))
 
 (defn set-config-map!
   [m]
@@ -30,6 +30,8 @@
 
 (defn config
   [& atts]
+  ;; avoid common error of calling at compile time rather than run
+  (assert @the-config "Config not set")
   (get-in @the-config atts))
 
 

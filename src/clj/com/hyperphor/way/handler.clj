@@ -51,10 +51,15 @@
 
 (defroutes base-site-routes
   (GET "/" [] (spa))                    ;index handled by spa
+  (GET "/health" []                     ;TODO exclude from log, see /opt/mt/repos/dotfiles/.m2/repository/ring-logger/ring-logger/1.1.1/logger.clj
+    (response/content-type
+     {:status 200
+      :body "I'm good"}
+     "text/plain"))
   (GET "/login" [] (login/login-view)) ;TODO only if OAuth configured
   (GET "/authenticated" req           ;on mgen, its /callback or somesuch
-       (let [original-page (get-in req [:cookies "way_landing" :value])] ;TODO
-         (response/redirect (if (empty? original-page) "/" original-page))))
+    (let [original-page (get-in req [:cookies "way_landing" :value])] ;TODO
+      (response/redirect (if (empty? original-page) "/" original-page))))
   (GET "/admin" req (admin/view req))
   #_ (GET "*" [] (spa))                    ;default is handled by spa
   (route/not-found "Not found")
@@ -190,10 +195,17 @@
       (wrap-filter "/api/*")            ;filter early so edn responses don't go to regular site requests
       ))
 
+(defn wrap-basic-authentication-except
+  [base]
+  (fn [request]
+    (if (oauth/open-uri? (:uri request))
+      (base request)
+      ((wrap-basic-authentication base authenticated?) request))))
+
 (defn app
   [app-site-routes app-api-routes]
   (let [base (routes (api-routes app-api-routes) (site-routes app-site-routes))]
-    (if (and (config/config :basic-auth) ;TODO just use :basic-auth-creds and eliminate this extra var
+    (if (and (config/config :basic-auth-creds)
              (not (config/config :dev-mode)))
-      (wrap-basic-authentication base authenticated?)
+      (wrap-basic-authentication-except base)
       base)))

@@ -28,10 +28,9 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/cdd/pharmakb-traverse.git"
+        "url": "git+https://github.com/mtravers/way.git"
     },
     "keywords": [],
     "author": "",
-    "license": "ISC",
-    "homepage": "https://github.com/parkerici/wayne"
+     "homepage": "https://shrouded-escarpment-03060-744eda4cc53f.herokuapp.com/"
 }
