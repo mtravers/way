@@ -101,10 +101,6 @@
                     })
          request)))))
 
-;;; Set or bind this false to bypass oauth and use local info instead
-#_
-(def ^:dynamic *oauth?* true)
-
 (defn wrap-enforce-login
   [handler responder]
   (fn [request]
@@ -116,14 +112,6 @@
             :else                                                    ; No id
             (responder request)         ; call the responder (which can (eg) return an error response)
             ))))
-
-#_
-(defn wrap-oauth-off
-  "Include as wrapper to disable Oauth."
-  [handler]
-  (fn [request]
-    (binding [*oauth?* false]
-      (handler request))))
 
 (defn wrap-oauth
   [handler]
