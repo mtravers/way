@@ -1,10 +1,10 @@
-(defproject com.hyperphor/way "0.1.6" 
+(defproject com.hyperphor/way "0.1.7" 
   :description "Way"
   :license {:name "EPL-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :deploy-repositories [["clojars" {:sign-releases false}]]
   :plugins [[lein-shadow "0.4.1"]]
-  :dependencies [[org.clojure/clojure "1.11.3"]
+  :dependencies [[org.clojure/clojure "1.12.0"]
                  [org.candelbio/multitool "0.1.7"]
                  [org.clojure/data.json "2.5.0"]
                  [environ "1.2.0"]
@@ -14,14 +14,14 @@
                  ;; Backend
                  [clj-http "3.13.0" :exclusions [commons-io]]
                  [compojure "1.7.1"]
-                 [ring "1.12.1"]
-                 [ring/ring-core "1.12.1"]
+                 [ring "1.12.2"]
+                 [ring/ring-core "1.12.2"]
                  [ring/ring-defaults "0.5.0"]
-                 [ring/ring-jetty-adapter "1.12.1"]
+                 [ring/ring-jetty-adapter "1.12.2"]
                  [ring-basic-authentication "1.2.0"]
                  [ring-logger "1.1.1"]
                  [ring-middleware-format "0.7.5" :exclusions [javax.xml.bind/jaxb-api]]
-                 [ring-oauth2 "0.1.4"]
+                 [ring-oauth2 "0.3.0"]  ;TODO upgraded version, need to verify it works
 
                  ;; Data
                  [clj-http "3.13.0" :exclusions [commons-io]]
@@ -30,7 +30,7 @@
                  ;; frontend
                  ;; See packge.json for the real dependencies
                  #_ [org.clojure/clojurescript "1.11.132"] ;causes shadow-cljs error, who knows
-                 [thheller/shadow-cljs "2.26.5"] ;TODO maybe only in dev profile
+                 [thheller/shadow-cljs "2.28.15"] ;TODO maybe only in dev profile
                  [reagent "1.2.0"]
                  [re-frame "1.4.3"]
                  [com.cemerick/url "0.1.1"]
