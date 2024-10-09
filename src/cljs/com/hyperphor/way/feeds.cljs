@@ -32,11 +32,8 @@
 ;;;    Or is it? Kind of declarative, fits in with react dataflow model
 (rf/reg-event-db
  :fetch
- (fn [db [_ [data-key event-params :as data-id]]]
-   (let [params (merge (get-in db [:params data-key]) ;TODO less certain about this...
-                       event-params
-                       {:data-id data-key} ;TODO fix terminology to be consistent
-                       )]
+ (fn [db [_ data-id params]]
+   (let [params (assoc params :data-id data-id)] 
      (api/api-get
       "/data"
       {:params params
@@ -62,21 +59,23 @@
 
 (rf/reg-event-db
  :fetch-once
- (fn [db [_ data-id]]
+ (fn [db [_ data-id params]]
    (when-not (get-in db [:data data-id])
-     (rf/dispatch [:fetch data-id]))))  ;TODO seems wrong? it shoudl be [:fetch [data-id]] I think?
+     (rf/dispatch [:fetch data-id params]))))  ;TODO seems wrong? it shoudl be [:fetch [data-id]] I think?
 
+;;; Changing: data-id is a keyword or vector, params is a map and optional
 (rf/reg-sub
  :data
- (fn [db [_ data-id]]
+ (fn [db [_ data-id params]]
    (let [data (or (get-in db [:data data-id]) [])]
      (case (get-in db [:data-status data-id])
        :valid data
        :fetching nil                   ; TODO unclear if it only means initial fetch or later ones
        :error []
-       (:invalid nil) (do (rf/dispatch [:fetch data-id])
+       (:invalid nil) (do (rf/dispatch [:fetch data-id params])
                           data)))))
 
+;;; Any adjustments to downloaded data. Called after the data is inserted into db, returns db
 (defmulti postload (fn [db id data] id))
 
 (defmethod postload :default
@@ -96,10 +95,10 @@
 (defn from-url
   [url]
   (when url
-    @(rf/subscribe [:data [:url {:url url}]])))
+    @(rf/subscribe [:data [:url url]])))
 
 (defmulti fetch identity)
 
 (defmethod fetch :default
   [data-id]
-  (rf/dispatch [:fetch [data-id]]))
+  (rf/dispatch [:fetch data-id]))
