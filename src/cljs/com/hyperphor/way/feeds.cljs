@@ -6,6 +6,15 @@
             )
   )
 
+;;; Feed theory:
+;;;;; Simple case: 
+;;; Apps get data by @(rf/subscribe :data-id <params>)
+;;; Backend managed data/data method.
+;;;;; More complex case:
+;;;  @(rf/subscribe [:data-id <s1>..] <params>)
+;;; Here the id is a vector, so you can have more than one of a type. 
+
+
 ;;; → Multitool, maybe, kind of silly. Would make more sense if you could include lists or generators in a path.
 (defn assoc*
   [m k v]
@@ -33,18 +42,16 @@
 (rf/reg-event-db
  :fetch
  (fn [db [_ data-id params]]
-   (let [params (assoc params :data-id data-id)] 
-     (api/api-get
-      "/data"
-      {:params params
-       :handler #(rf/dispatch [::loaded data-id %])
-       :error-handler #(rf/dispatch [:data-error data-id %1]) ;Override standard error handler
-       })
-     (-> db
-         (assoc :loading? true)
-         ;; blanks out view in between updates, which we don't want
-         ;; (assoc-in [:data-status data-id] :fetching)
-         ))))
+   (api/api-get
+    "/data"
+    {:params (assoc params :data-id data-id)
+     :handler #(rf/dispatch [::loaded data-id params %])
+     :error-handler #(rf/dispatch [:data-error data-id %1]) ;Override standard error handler
+     })
+   (-> db
+       (assoc :loading? true)
+       (assoc-in [:data-status data-id] :fetching)
+       (assoc-in [:data-params data-id] params))))
 
 (rf/reg-event-db
  :data-error
@@ -68,12 +75,12 @@
  :data
  (fn [db [_ data-id params]]
    (let [data (or (get-in db [:data data-id]) [])]
-     (case (get-in db [:data-status data-id])
-       :valid data
-       :fetching nil                   ; TODO unclear if it only means initial fetch or later ones
-       :error []
-       (:invalid nil) (do (rf/dispatch [:fetch data-id params])
-                          data)))))
+     (let [status (get-in db [:data-status data-id])
+           last-params (get-in db [:data-params data-id])
+           invalid? (or (= status :invalid) (not (= params last-params)))]
+       (when invalid?
+         (rf/dispatch [:fetch data-id params]))
+       data))))
 
 ;;; Any adjustments to downloaded data. Called after the data is inserted into db, returns db
 (defmulti postload (fn [db id data] id))
@@ -84,13 +91,19 @@
 
 (rf/reg-event-db
  ::loaded
- (fn [db [_ data-id data]]
-   (-> db
+ (fn [db [_ data-id params data]]
+   (if (= params (get-in db [:data-params data-id]))
+     (-> db
        (assoc-in [:data data-id] data)
        (assoc-in [:data-status data-id] :valid) ;not necessarily, UI could have changed while we were loading!
        (assoc :loading? false)
        (postload data-id data)
-       )))
+       )
+     (do
+       ;; TODO 
+       (prn :timing-issue? data-id params (get-in db [:data-params data-id]))
+       db)
+     )))
 
 (defn from-url
   [url]
