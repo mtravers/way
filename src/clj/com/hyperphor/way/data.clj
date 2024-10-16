@@ -73,7 +73,9 @@
 
 
 (defmulti data (fn [{:keys [data-id] :as params}]
-                 (keyword data-id)))
+                 (if (vector? data-id)
+                   (keyword (first data-id))
+                   (keyword data-id))))
 
 (defmethod data :default
   [params]
