@@ -4,7 +4,7 @@ The way that can be named is not the eternal way. – Lao Tzu
 
 A base for building data-oriented websites it Clojure, ClojureScript, and Vega. Does nothing especially new or fancy, just brings what I need together in one place.
 
-[Demo site](https://shrouded-escarpment-03060-744eda4cc53f.herokuapp.com/)
+[Demo site](https://way-demo-4ed0361a3a3b.herokuapp.com/)
 
 
 ## Features
@@ -59,6 +59,10 @@ To run locally:
     npm install
     lein shadow compile app
     lein run <port>
+
+### Deploy
+
+lein deply clojars
 
 ### Notes
 

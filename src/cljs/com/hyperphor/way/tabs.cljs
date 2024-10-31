@@ -5,6 +5,7 @@
 
 ;;; manages any kind of tabbed ui, or top level pages
 
+;;; TODO belongs elsewhere
 (rf/reg-sub
  :page
  (fn [db _]

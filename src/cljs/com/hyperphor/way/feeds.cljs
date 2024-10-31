@@ -11,7 +11,7 @@
 ;;; Apps get data by @(rf/subscribe :data-id <params>)
 ;;; Backend managed data/data method.
 ;;;;; More complex case:
-;;;  @(rf/subscribe [:data-id <s1>..] <params>)
+;;;  @(rf/subscribe [:data [:data-id <s1>..] <params>)
 ;;; Here the id is a vector, so you can have more than one of a type. 
 
 
@@ -44,7 +44,8 @@
  (fn [db [_ data-id params]]
    (api/api-get
     "/data"
-    {:params (assoc params :data-id data-id)
+    {:params (merge (get-in db [:params data-id])
+                    (assoc params :data-id data-id)) 
      :handler #(rf/dispatch [::loaded data-id params %])
      :error-handler #(rf/dispatch [:data-error data-id %1]) ;Override standard error handler
      })

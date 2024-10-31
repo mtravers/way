@@ -1,4 +1,4 @@
-(defproject com.hyperphor/way "0.1.8" 
+(defproject com.hyperphor/way "0.1.9" 
   :description "Way"
   :license {:name "EPL-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
