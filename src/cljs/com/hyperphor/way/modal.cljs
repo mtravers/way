@@ -3,6 +3,9 @@
    [re-frame.core :as rf]
    [com.hyperphor.way.web-utils :as wu]))
 
+;;; Modal popups.
+
+
 (rf/reg-event-db
  :modal
  (fn [db [_ data]]
@@ -27,14 +30,15 @@
 
 ;;; TODO ok-text and ok-enabled? should default better
 (defn- modal-contents
-  [{:keys [title contents ok-handler ok-text ok-enabled?] :as foo}]
+  [{:keys [title contents ok-handler ok-text ok-enabled? popout?] :as foo}]
   [:div.modal-content.panel-danger
    [:div.modal-header.panel-heading
     title
     [:span.close                        ;floats right
-     [:button {:type "button" :title "Popout"
-               :on-click #(popout %)}
-      [:i.material-icons "open_in_new"]]
+     (when popout?
+       [:button {:type "button" :title "Popout"
+                 :on-click #(popout %)}
+        [:i.material-icons "open_in_new"]])
      [:button {:type "button" :title "Cancel"
                :on-click #(close-modal)}
       [:i.material-icons "close"]]]]

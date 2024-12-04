@@ -13,6 +13,8 @@ A base for building data-oriented websites it Clojure, ClojureScript, and Vega. 
 - Web utilities (spinners, modals, forms, etc)
 - Data fetching 
 
+- /health endpoint
+
 - Vega tooling for clustered heatmaps
 - Vega tooling for violin diagrams
 - Ag-grid wrapping for data tables

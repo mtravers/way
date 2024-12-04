@@ -13,7 +13,7 @@
 
 (def vega-lite-adapter (reagent/adapt-react-class rv/VegaLite))
 
-;;; TODO data is being overused, ommiting it should not hide the thing
+;;; TODO data is being overused, omitting it should not hide the thing
 (defn vega-lite-view
   [spec data]
   (when data

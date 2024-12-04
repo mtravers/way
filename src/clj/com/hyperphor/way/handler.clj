@@ -128,6 +128,8 @@
       (assoc-in [:session :cookie-attrs :same-site] :lax) ;for oauth
       (assoc-in [:session :store] common-store)))
 
+(def log-exclude #{"/health"})
+
 (defn site-routes
   [app-site-routes]
   (-> (routes app-site-routes base-site-routes)
@@ -142,7 +144,10 @@
       wrap-exception-handling
       (logger/wrap-with-logger          ;hook Ring logger to Timbre
        {:log-fn (fn [{:keys [level throwable message]}]
-                  (log/log level throwable message))})
+                  (log/log level throwable message))
+        :transform-fn (fn [{:keys [level throwable message] :as item}]
+                        (when-not (contains? log-exclude (:uri message))
+                          item))})
       ))
 
 ;;; Copied oout of middleware
