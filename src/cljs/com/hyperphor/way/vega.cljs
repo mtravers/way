@@ -27,12 +27,13 @@
 ;;;     {:name "click"
 ;;;      :on [{:events "symbol:click" :update "datum"}]}
 
+;;; listeners: eg: {"click" (fn [_ v] (rf/dispatch [:vega-click v]))}
 (defn vega-view
-  [spec data]
+  [spec data & {:keys [listeners]}]
   (when data
     [vega-adapter {:data (clj->js data)
                    :spec (clj->js spec)
-                   :signalListeners (clj->js {"click" (fn [_ v] (rf/dispatch [:vega-click v]))}) ;TODO not yet wired in, need an example. 
+                   :signalListeners (clj->js listeners)
                    :actions (config/config :dev-mode)
                    }]))
 
