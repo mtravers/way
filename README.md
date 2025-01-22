@@ -64,7 +64,7 @@ To run locally:
 
 ### Deploy
 
-lein deply clojars
+lein deploy clojars
 
 ### Notes
 

@@ -19,7 +19,7 @@
   (when data
     [vega-lite-adapter {:data (clj->js data)
                         :spec (clj->js spec)
-                        :actions (config/config :dev-mode)}]))
+                        :actions (boolean (config/config :dev-mode))}]))
 
 (def vega-adapter (reagent/adapt-react-class rv/Vega))
 
@@ -28,13 +28,14 @@
 ;;;      :on [{:events "symbol:click" :update "datum"}]}
 
 ;;; listeners: eg: {"click" (fn [_ v] (rf/dispatch [:vega-click v]))}
+;;; TODO :actions should be a param 
 (defn vega-view
   [spec data & {:keys [listeners]}]
   (when data
     [vega-adapter {:data (clj->js data)
                    :spec (clj->js spec)
                    :signalListeners (clj->js listeners)
-                   :actions (config/config :dev-mode)
+                   :actions (boolean (config/config :dev-mode))
                    }]))
 
 ;;; ⟐⚇⟐ spec manipulators ⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇
