@@ -97,11 +97,12 @@
   [:script {:src (app-url)}])
 
 (defn html-frame-spa
-  []
+  [& {:keys [main title] :or {main (config/config :app-main )
+                              title (config/config :app-title)}}]
   (html
     `[:html
       [:head
-       [:title ~(config/config :app-title)]
+       [:title ~title]
        [:meta {:charset "UTF-16"}]
        [:link {:href "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
                :rel "stylesheet"
@@ -117,7 +118,7 @@
                  :integrity "sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
                  :crossorigin "anonymous"}]
        ~@(map (fn [js] [:script {:src js}]) (config/config :js))
-       [:script ~(format "window.onload = function() { %s(); }" (config/config :app-main ))]
+       [:script ~(format "window.onload = function() { %s(); }" main)]
        ]]))
 
 
