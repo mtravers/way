@@ -3,26 +3,39 @@
             [com.hyperphor.way.views.html :as html]
             [com.hyperphor.way.config :as config]
             [hiccup.util :as hu]
+            [org.candelbio.multitool.core :as u]
+            [clojure.set :as set]
+            [org.candelbio.multitool.nlp :as nlp]
             )
   )
-
-;;; TODO gaping security hole, not really acceptable. At least it is behind basic-auth
-;;; Maybe automatically redact items with "crendential" or other privacy relevant strings
-
 
 ;;; TODO git commit information, etc. Can't run git on server, somehow need to sneak it into an uberjar. Hm you could just
 ;;; link a resource to  ./.git/logs/HEAD
 
+(def redactable #{"token" "api" "key" "cred" "creds" "credential" "credentials" "password"})
+
+(defn redact?
+  [k]
+  (not (empty? (set/intersection redactable (set (nlp/tokens (name k)))))))
+
+(defn redact
+  [map]
+  (u/map-key-values (fn [k v] (if (redact? k)
+                                  "*REDACTED*"
+                                  v))
+                    map))
+
 (defn map-table
   [name map]
-  [:div [:h2 name]
-   [:table.table-bordered
-    (for [key (sort (keys map))]
-      [:tr
-       [:th (str key)]
-       [:td (if (map? (get map key))
-              (map-table "" (get map key))
-              (hu/escape-html (str (get map key))))]])]])
+  (let [map (redact map)]
+    [:divto [:h2 name]
+     [:table.table-bordered
+      (for [key (sort (keys map))]
+        [:tr
+         [:th (str key)]
+         [:td (if (map? (get map key))
+                (map-table "" (get map key))
+                (hu/escape-html (str (get map key))))]])]]))
 
 (defn view
   [req]

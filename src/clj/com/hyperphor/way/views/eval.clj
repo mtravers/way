@@ -7,13 +7,14 @@
 ;;; Danger will robinson
 
 (def eval-enabled? (atom false))
+(def magic-hash 932508623)
 
 (defn remote-eval
   [form magic]
   (str
    (try
      ;; Extra protection
-     (assert (= (hash magic) 488645444) "Needs more magic")
+     (assert (= (hash magic) magic-hash) "Needs more magic")
      (eval (read-string form)) ;danger will robinson
      (catch Exception e
        {:status 500
