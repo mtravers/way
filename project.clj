@@ -5,7 +5,7 @@
   :deploy-repositories [["clojars" {:sign-releases false}]]
   :plugins [[lein-shadow "0.4.1"]]
   :dependencies [[org.clojure/clojure "1.12.0"]
-                 [org.candelbio/multitool "0.1.10"]
+                 [org.candelbio/multitool "0.1.11"]
                  [org.clojure/data.json "2.5.1"]
                  [environ "1.2.0"]
                  [com.taoensso/timbre "6.5.0"]
@@ -30,7 +30,7 @@
                  ;; frontend
                  ;; See packge.json for the real dependencies
                  #_ [org.clojure/clojurescript "1.11.132"] ;causes shadow-cljs error, who knows
-                 [thheller/shadow-cljs "2.28.15"] ;TODO maybe only in dev profile
+                 [thheller/shadow-cljs "3.1.4"] ;TODO maybe only in dev profile
                  [reagent "1.2.0"]
                  [re-frame "1.4.3"]
                  [com.cemerick/url "0.1.1"]

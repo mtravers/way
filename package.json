@@ -8,9 +8,12 @@
         "test": "test"
     },
     "dependencies": {
-        "ag-grid-community": "^31.0.1",
-        "ag-grid-enterprise": "^31.0.1",
-        "ag-grid-react": "^31.0.1",
+        "@blocknote/core": "^0.31.0",
+        "@blocknote/mantine": "^0.31.0",
+        "@blocknote/react": "^0.31.0",
+        "ag-grid-community": "^31.3.4",
+        "ag-grid-enterprise": "^31.3.4",
+        "ag-grid-react": "^31.3.4",
         "create-react-class": "^15.7.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
@@ -18,7 +21,7 @@
         "vega-lite": "^5.15.1"
     },
     "devDependencies": {
-        "shadow-cljs": "2.26.5"
+        "shadow-cljs": "3.1.4"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -29,5 +32,5 @@
     },
     "keywords": [],
     "author": "",
-     "homepage": "https://shrouded-escarpment-03060-744eda4cc53f.herokuapp.com/"
+    "homepage": "https://shrouded-escarpment-03060-744eda4cc53f.herokuapp.com/"
 }
