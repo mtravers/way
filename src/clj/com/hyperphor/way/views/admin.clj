@@ -12,7 +12,8 @@
 ;;; TODO git commit information, etc. Can't run git on server, somehow need to sneak it into an uberjar. Hm you could just
 ;;; link a resource to  ./.git/logs/HEAD
 
-(def redactable #{"token" "api" "key" "cred" "creds" "credential" "credentials" "password"})
+;;; Redact secrets. NOTE: this is not 100% reliable of course
+(def redactable #{"token" "api" "key" "cred" "creds" "credential" "credentials" "password" "secret"})
 
 (defn redact?
   [k]

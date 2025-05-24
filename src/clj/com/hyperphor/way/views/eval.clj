@@ -5,6 +5,7 @@
             ))
 
 ;;; Danger will robinson
+;;; TODO should maintain a replayale history (eg a repl)
 
 (def eval-enabled? (atom false))
 (def magic-hash 932508623)
@@ -15,9 +16,10 @@
    (try
      ;; Extra protection
      (assert (= (hash magic) magic-hash) "Needs more magic")
+     ;; TODO result needs HTML quoting
      (eval (read-string form)) ;danger will robinson
      (catch Exception e
-       {:status 500
+       {:status 500                     ;TODO this is wrong
         :headers {}
         :body (str e)}))))
 
@@ -35,17 +37,17 @@
       [:div
        (forms/aform
         params
-        [{:path [:form] :type :textarea}
+        [{:path [:form] :type :textarea} ;TODO make wider
          {:path [:magic]}
          ]
         :edit? true
-        :submit "Eval"
+        :submit "Eval"                  ;TODO put at bottom
         :cancel? false)
 
        (when result
-       [:div
-        [:h4 "Result"]
-        [:pre result]])])
+         [:div
+          [:h4 "Result"]
+          [:pre result]])])
     [:h3 "Nothing to see here"]))
 
 

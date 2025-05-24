@@ -75,10 +75,12 @@
 (rf/reg-sub
  :data
  (fn [db [_ data-id params]]
-   (let [data (or (get-in db [:data data-id]) [])]
+   (let [data (get-in db [:data data-id])]
      (let [status (get-in db [:data-status data-id])
            last-params (get-in db [:data-params data-id])
-           invalid? (or (= status :invalid) (not (= params last-params)))]
+           invalid? (or (nil? data)
+                        (= status :invalid)
+                        (not (= params last-params)))]
        (when invalid?
          (rf/dispatch [:fetch data-id params]))
        data))))

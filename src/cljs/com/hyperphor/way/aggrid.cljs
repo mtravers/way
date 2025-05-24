@@ -73,7 +73,7 @@
   col-defs: a map of col ids to maps. Fields are the standard ag-grid plus:
      :url-template : a format string from values to URL links
 "
-  [data & {:keys [checkboxes? class col-defs id columns ag-grid-options]}]
+  [data & {:keys [checkboxes? autosize? class col-defs id columns ag-grid-options]}]
   (let [columns (or columns (keys (first data)))
         id (or id (gensym "ag"))
         column-defs (mapv #(ag-col-def % (get col-defs %)) columns)]
@@ -88,9 +88,10 @@
                               }
               :onGridReady (fn [params]
                              (swap! ag-apis assoc id (.-api params)))
-              :onFirstDataRendered (fn [params]
-                                     (let [column-api (.-columnApi params)] 
-                                       (.autoSizeColumns column-api (apply array (map :field column-defs)))))
+              :onFirstDataRendered (when autosize?
+                                     (fn [params]
+                                       (let [api (.-api params)] 
+                                         (.autoSizeAllColumns api))))
               :columnDefs column-defs
               :rowData data
               :onColumnHeaderClicked (fn [params]

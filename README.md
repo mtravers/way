@@ -65,6 +65,7 @@ To run locally:
 ### Deploy
 
 lein deploy clojars
+using Hyperphor token
 
 ### Notes
 
