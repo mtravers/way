@@ -111,7 +111,7 @@
 (defn from-url
   [url]
   (when url
-    @(rf/subscribe [:data [:url url]])))
+    @(rf/subscribe [:data :url {:url url}])))
 
 (defmulti fetch identity)
 
