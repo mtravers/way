@@ -35,7 +35,6 @@
 
 ;;; TODO needs some work
 (defmulti ag-col-def (fn [col {:keys [url-template multiple?]:as col-def}]
-                       (prn :acd col col-def)
                        (if (or url-template multiple?)
                          :html
                          :default)))

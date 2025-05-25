@@ -52,8 +52,9 @@
 
 ;;; TODO this looks like a massive security hole. Although what harm can parsing json do?
 (defn url-data
-  [{:keys [url]}]
-  (let [ext (file-ext url)
+  [{:keys [data-id]}]
+  (let [url (second data-id)
+        ext (file-ext url)
         base (case ext
                "json" (-> url
                           slurp

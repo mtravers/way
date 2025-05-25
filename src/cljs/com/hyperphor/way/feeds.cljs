@@ -80,9 +80,11 @@
            last-params (get-in db [:data-params data-id])
            invalid? (or (nil? data)
                         (= status :invalid)
-                        (not (= params last-params)))]
-       (when invalid?
-         (rf/dispatch [:fetch data-id params]))
+                        (not (= params last-params))
+                        )]
+       (when-not (= status :error)
+         (when invalid?
+           (rf/dispatch [:fetch data-id params])))
        data))))
 
 ;;; Any adjustments to downloaded data. Called after the data is inserted into db, returns db
@@ -111,7 +113,7 @@
 (defn from-url
   [url]
   (when url
-    @(rf/subscribe [:data :url {:url url}])))
+    @(rf/subscribe [:data [:url url]])))
 
 (defmulti fetch identity)
 
