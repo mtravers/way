@@ -177,7 +177,7 @@
                :fill {:field value-field :scale "color"}
                :tooltip {:signal (when tooltip?
                                    (u/expand-template
-                                    "{ '{{h-field}}': datum.{{h-field}}, '{{v-field}}': datum.{{v-field}}, '{{value-field}}': datum.{{value-field}}}"
+                                    "{ '{{h-field}}': datum['{{h-field}}'], '{{v-field}}': datum['{{v-field}}'], '{{value-field}}': datum['{{value-field}}']}"
                                     {:h-field (name h-field) :v-field (name v-field) :value-field (name value-field)}
                                     ))}}}}
             ]

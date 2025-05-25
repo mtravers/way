@@ -5,6 +5,8 @@
             )
   )
 
+;;; TODO update this and example from BRUCE
+
 (defn spec
   [data dim feature options]
   (let [dim (name dim)
