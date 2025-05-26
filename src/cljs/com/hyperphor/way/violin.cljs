@@ -19,6 +19,8 @@
       {:name "blobSpace" :value 750 :bind {:input :range, :min 100, :max 2000}}
       {:name "height", :update "blobSpace"}
       {:name "points", :value true, :bind {:input "checkbox"}}
+      {:name "boxes" :value true :bind {:input "checkbox"}}
+      {:name "violins" :value true :bind  {:input "checkbox"}}
       {:name "jitter" :value 50 :bind {:input :range, :min 0, :max 200}}
       {:name "trim", :value true, :bind {:input "checkbox"}}
 
@@ -41,9 +43,9 @@
        :transform
        [{:type "aggregate",
          :groupby [dim],
-         :fields ["feature_value" "feature_value" "feature_value"],
-         :ops ["q1" "median" "q3"],
-         :as ["q1" "median" "q3"]}]}]
+         :fields ["feature_value" "feature_value" "feature_value" "feature_value" "feature_value"],
+         :ops ["min" "q1" "median" "q3" "max"],
+         :as ["min" "q1" "median" "q3" "max"]}]}]
 
      :config {:axisBand {:bandPosition 1, :tickExtra true, :tickOffset 0}},
      :axes
@@ -80,7 +82,21 @@
          :source "stats",
          :transform [{:type "filter", :expr (wu/js-format "datum.%s === parent.%s" dim dim)}]}],
        :marks
-       [{:type "symbol",
+       [
+
+        ;; Violins
+        {:type "area",
+         :from {:data "violin"},
+         :encode
+         {:enter {:fill {:scale "color", :field {:parent dim}}},
+          :update
+          {:x {:scale "xscale", :field "value"},
+           :yc {:signal "blobWidth / 2"},
+           :height {:scale "hscale", :field "density"}
+           :opacity {:signal "violins ? 1 : 0"}}}}
+
+        ;; Points
+        {:type "symbol",
          :from {:data "source"},
          :encode
          {:enter {:fill "black", :y {:value 0}},
@@ -94,27 +110,53 @@
            :opacity {:signal "points ? 0.3 : 0"},
            :shape {:value "circle"},
            :x {:scale "xscale", :field "feature_value"}}}}
-        {:type "area",
-         :from {:data "violin"},
-         :encode
-         {:enter {:fill {:scale "color", :field {:parent dim}}},
-          :update
-          {:x {:scale "xscale", :field "value"},
-           :yc {:signal "blobWidth / 2"},
-           :height {:scale "hscale", :field "density"}}}}
+
+        ;; Box outline
+
         {:type "rect",
          :from {:data "summary"},
          :encode
-         {:enter {:fill {:value "black"}, :height {:value 2}},
+         {:enter {:stroke {:value "black"},
+                  :height {:value 2}
+                  :cornerRadius {:value 4}
+                  },
           :update
           {:x {:scale "xscale", :field "q1"},
            :x2 {:scale "xscale", :field "q3"},
-           :yc {:signal "blobWidth / 2"}}}}
-        {:type "rect",
+           :height {:signal "blobWidth / 5"}
+           :yc {:signal "blobWidth / 2"}
+           :opacity {:signal "boxes ? 1 : 0"}
+           :fill {:signal (str "violins ? '' :  scale('color', datum." dim ")")} 
+           }
+          }}
+
+
+
+        ;; Midpoint
+       {:type "rect",
          :from {:data "summary"},
          :encode
-         {:enter {:fill {:value "black"}, :width {:value 2}, :height {:value 8}},
-          :update {:x {:scale "xscale", :field "median"}, :yc {:signal "blobWidth / 2"}}}}]}],
+         {:enter {:fill {:value "black"},
+                  :width {:value 2},
+                  :height {:value 8}},
+          :update {:x {:scale "xscale", :field "median"},
+                   :yc {:signal "blobWidth / 2"}
+                   :opacity {:signal "boxes ? 1 : 0"}}}}
+
+        ;; Whisker 
+        {:type "rect",                 
+         :from {:data "summary"},
+         :encode
+         {:enter {:fill {:value "black"},
+                  :height {:value 2}},
+          :update {:x {:scale "xscale", :field "min"},
+                   :x2 {:scale "xscale", :field "max"}
+                   :yc {:signal "blobWidth / 2"}
+                   :height {:value 2}
+                   :opacity {:signal "boxes ? 1 : 0"}
+                   }}}
+
+        ]}],
      }))
 
 (def default-options {})

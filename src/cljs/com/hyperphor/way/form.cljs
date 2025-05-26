@@ -183,8 +183,7 @@
     (wu/select-widget id value dispatch options nil disabled?)))
 
 ;;; TODO multiselect
-
-
+;;; TODO select from a data feed (see https://github.com/mtravers/exobrain/blob/source-docs/src/cljs/exobrain/ui/forms.cljs#L174)
 
 ;;; For upload
 (defmethod form-field :local-files
