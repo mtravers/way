@@ -9,8 +9,6 @@
 
 ;;; TODO package in a Vega transform, see https://vega.github.io/vega/docs/api/extensibility/#transform
 
-
-
 ;;; Not presently used, TODO should be an option, it actually seems better in some cases
 (defn manhattan-distance
   [v1 v2]
@@ -27,10 +25,12 @@
 ;;; idcol: dimension to be clustered
 ;;; → multitool
 
-;;; For clarity, clustering rows by columns (but actually works on mapseqs so any field can be "row" or "column")
+;;; For clarity, expressed as rows by columns (but actually works on mapseqs so any field can be "row" or "column")
+;;; maps: mapseq, each entry represents a cell in the heatmap
 ;;; row-dim: the field containing the leaf clusters (rows)
 ;;; col-dim: the other dimension (columns)
 ;;; value-field: field containing values to be clustered
+;;;   Note: I suppose there is no reason why value field couldn't be a function or a set of fields...
 (defn cluster
   [maps row-dim col-dim value-field]
   (let [indexed (u/map-values

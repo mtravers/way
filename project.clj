@@ -43,7 +43,8 @@
                  [day8.re-frame/re-frame-10x "1.9.9"] ;TODO dev only
 
                  ]
-  :source-paths ["src/cljc" "src/clj" "src/cljs"] 
+  :source-paths ["src/cljc" "src/clj" "src/cljs"]
+  :test-paths ["test/cljc" "test/clj" "test/cljs"] 
   :clean-targets ^{:protect false} ["target" ".shadow-cljs" "resources/public/cljs-out"]
 
   :profiles {:uberjar {;; :aot [com.hyperphor.way.demo.core]
