@@ -259,6 +259,7 @@
              [path @(rf/subscribe [:form-field-value path])])))))
 
 ;;; TODO separate non-SPA for files??
+;;; TODO THis is completely broke, gather-fields calls subscribe which is not legal
 (defn wform
   [fields action]
   [:div.wform                           ;Not :form, to prevent a page trnasition

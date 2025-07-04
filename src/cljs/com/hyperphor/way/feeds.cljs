@@ -80,6 +80,7 @@
            last-params (get-in db [:data-params data-id])
            invalid? (or (nil? data)
                         (= status :invalid)
+                        (= status :fetching)
                         (not (= params last-params))
                         )]
        (when-not (= status :error)

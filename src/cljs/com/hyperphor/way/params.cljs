@@ -53,6 +53,11 @@
      (get-in db (concat [:params data-id] param))
      (get-in db [:params data-id param]))))
 
+(rf/reg-sub
+ :params
+ (fn [db [_ data-id]]
+   (get-in db [:params data-id])))
+
 (defn safe-name
   [thing]
   (when thing

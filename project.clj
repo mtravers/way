@@ -1,4 +1,4 @@
-(defproject com.hyperphor/way "0.1.13" 
+(defproject com.hyperphor/way "0.1.16" 
   :description "Way"
   :license {:name "EPL-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
@@ -14,14 +14,15 @@
                  ;; Backend
                  [clj-http "3.13.0" :exclusions [commons-io]]
                  [compojure "1.7.1"]
-                 [ring "1.12.2"]
-                 [ring/ring-core "1.12.2"]
-                 [ring/ring-defaults "0.5.0"]
-                 [ring/ring-jetty-adapter "1.12.2"]
+                 [ring "1.14.1"]
+                 [ring/ring-core "1.14.1"]
+                 [ring/ring-defaults "0.6.0"]
+                 [ring/ring-jetty-adapter "1.14.1"]
                  [ring-basic-authentication "1.2.0"]
                  [ring-logger "1.1.1"]
                  [ring-middleware-format "0.7.5" :exclusions [javax.xml.bind/jaxb-api]]
                  [ring-oauth2 "0.3.0"]  ;TODO upgraded version, need to verify it works
+                 [ring/ring-codec "1.3.0"]
 
                  ;; Data
                  [clj-http "3.13.0" :exclusions [commons-io]]
@@ -54,8 +55,8 @@
                        }}
 
   :shadow-cljs {:lein true
-                #_ :builds
-                #_ {:app {:target :browser
+                :builds
+                {:app {:target :browser
                        :compiler-options {:infer-externs true}
                        :output-dir "resources/public/cljs-out"
                        :asset-path "/cljs-out"         ;webserver path

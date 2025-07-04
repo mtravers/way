@@ -4,7 +4,6 @@
    [clojure.walk :as walk]
    [com.hyperphor.way.ui.config :as config]
    [reagent.core :as reagent]
-   [re-frame.core :as rf]
    ["react-vega" :as rv]))
 
 ;;; TODO some convenient way to call vl → vega compiler
@@ -15,10 +14,11 @@
 
 ;;; TODO data is being overused, omitting it should not hide the thing
 (defn vega-lite-view
-  [spec data]
+  [spec data & {:keys [listeners]}]
   (when data
     [vega-lite-adapter {:data (clj->js data)
                         :spec (clj->js spec)
+                        :signalListeners (clj->js listeners)
                         :actions (boolean (config/config :dev-mode))}]))
 
 (def vega-adapter (reagent/adapt-react-class rv/Vega))
@@ -40,6 +40,10 @@
 
 ;;; ⟐⚇⟐ spec manipulators ⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇
 
+;;; Use this in specs when field name might have dots or other problematic characters.
+(defn bracketize
+  [s]
+  (when s (str "[" s "]")))
 
 (defn- patch-matches?
   [id thing]

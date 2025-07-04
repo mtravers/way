@@ -51,6 +51,7 @@
   (map #(u/map-values u/coerce-numeric %) ds))
 
 ;;; TODO this looks like a massive security hole. Although what harm can parsing json do?
+;;; doesn't work on local urls
 (defn url-data
   [{:keys [data-id]}]
   (let [url (second data-id)
