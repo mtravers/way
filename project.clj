@@ -4,8 +4,8 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :deploy-repositories [["clojars" {:sign-releases false}]]
   :plugins [[lein-shadow "0.4.1"]]
-  :dependencies [[org.clojure/clojure "1.12.0"]
-                 [org.candelbio/multitool "0.1.11"]
+  :dependencies [[org.clojure/clojure "1.12.1"]
+                 [org.candelbio/multitool "0.1.12"]
                  [org.clojure/data.json "2.5.1"]
                  [environ "1.2.0"]
                  [com.taoensso/timbre "6.5.0"]
@@ -39,21 +39,19 @@
                  ;; [bidi "2.1.6"]     
                  ;; [kibu/pushy "0.3.8"]
                  [cljs-ajax "0.8.4"]
-                 [day8.re-frame/tracing "0.6.2"]      ;TODO dev only
-                 [day8.re-frame/re-frame-10x "1.9.9"] ;TODO dev only
-
+                 
                  ]
   :source-paths ["src/cljc" "src/clj" "src/cljs"]
   :test-paths ["test/cljc" "test/clj" "test/cljs"] 
   :clean-targets ^{:protect false} ["target" ".shadow-cljs" "resources/public/cljs-out"]
 
-  :profiles {:uberjar {;; :aot [com.hyperphor.way.demo.core]
-                       ;; :omit-source true
-                       :prep-tasks [["shadow" "release" "npm"] "javac" "compile"] ;NOTE if you omit the javac compile items, :aot stops working!  "javac" "compile"
-                       ;; TEMP removed to try to shrink jar file
-                       :resource-paths ["resources"]
-                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]
-                       }}
+  :jar-exclusions [#".*public/css/node.*"
+                   #".*public/css/ag-grid.*"]
+
+  :profiles {
+             :dev {:dependencies [[thheller/shadow-cljs "3.1.7"]
+                                  [day8.re-frame/tracing "0.6.2"]     
+                                  [day8.re-frame/re-frame-10x "1.9.9"]]}}
 
   :shadow-cljs {:lein true
                 :builds

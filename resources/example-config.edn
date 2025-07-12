@@ -1,0 +1,25 @@
+;;; Way config. Read via Aero https://github.com/juxt/aero which supports #env
+
+;;; This is mostly to illustrate/document the options, see https://github.com/mtravers/way-demo/blob/main/resources/config.edn for a real one
+
+{
+ ;; Idenitty
+ :app-title "Rawsugar"
+ :app-main "org.candelabra.rawsugar.init" ;TODO this is also in project.clj and would be good if we could just read it from there.
+ :colophon  ["Copyright © " [:a {:href "http://hyperphor.com" :style "color: white;"} "Hyperphor"] " 2020-2024"] ;TODO
+
+ ;; Security
+ :dev-mode false
+ :basic-auth-creds nil                  ;[name pwd]
+ :oauth {:client-id "549802309065-ob55bl04u176naebr4qtqt18oku8tk4b.apps.googleusercontent.com"
+         :client-secret #env "OAUTH_CLIENT_SECRET"
+         :callback "https://rawsugar.parkerici.org/oauth2/google/callback"
+         }
+
+ ;; Customization
+ :css ["demo/css/node/@blocknote/mantine/dist/style.css"
+       "demo/css/node/@blocknote/core/src/fonts/inter.css"]
+ :js ["demo/js/leader-line.min.js"]
+ :open-uris ["public/policy.html"]
+
+ }
