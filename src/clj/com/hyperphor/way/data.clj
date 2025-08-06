@@ -3,6 +3,7 @@
             [org.candelbio.multitool.core :as u]
             [org.candelbio.multitool.cljcore :as ju]
             [org.candelbio.multitool.math :as mu]
+            [com.hyperphor.way.config :as config]
             [clojure.string :as str]
             [clojure.data.json :as json]
             [clojure.java.io :as io]
@@ -87,7 +88,9 @@
   [params]
   (url-data params))
 
-
+(defmethod data :config
+  [_]
+  (config/config))
 
 
 

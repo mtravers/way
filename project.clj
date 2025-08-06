@@ -1,4 +1,4 @@
-(defproject com.hyperphor/way "0.1.16" 
+(defproject com.hyperphor/way "0.1.17" 
   :description "Way"
   :license {:name "EPL-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
@@ -27,6 +27,7 @@
                  ;; Data
                  [clj-http "3.13.0" :exclusions [commons-io]]
                  [org.clojure/data.csv "1.1.0"]
+                 [io.github.nextjournal/markdown "0.7.186"] 
 
                  ;; frontend
                  ;; See packge.json for the real dependencies
