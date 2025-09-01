@@ -1,4 +1,4 @@
-(defproject com.hyperphor/way "0.1.17" 
+(defproject com.hyperphor/way "0.1.18" 
   :description "Way"
   :license {:name "EPL-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
@@ -36,11 +36,7 @@
                  [reagent "1.2.0"]
                  [re-frame "1.4.3"]
                  [com.cemerick/url "0.1.1"]
-                 ;; TODO for navigation when that works
-                 ;; [bidi "2.1.6"]     
-                 ;; [kibu/pushy "0.3.8"]
                  [cljs-ajax "0.8.4"]
-                 
                  ]
   :source-paths ["src/cljc" "src/clj" "src/cljs"]
   :test-paths ["test/cljc" "test/clj" "test/cljs"] 
@@ -60,7 +56,7 @@
                        :compiler-options {:infer-externs true}
                        :output-dir "resources/public/cljs-out"
                        :asset-path "/cljs-out"         ;webserver path
-                       :modules {:dev-main {:entries [com.hyperphor.way.demo.app]}}
+                       ;; :modules {:dev-main {:entries [com.hyperphor.way.demo.app]}}
                        :devtools {:preloads [day8.re-frame-10x.preload.react-18]}
                        :dev {:compiler-options
                              {:closure-defines
