@@ -16,9 +16,9 @@
 (defn vega-lite-view
   [spec data & {:keys [listeners]}]
   (when data
-    [vega-lite-adapter {:data (clj->js data)
+    [vega-lite-adapter {:data (clj->js data) ;TODO this has been removed in react-vaga v8. See https://github.com/vega/react-vega?tab=readme-ov-file#3-subscribe-to-signal-events
                         :spec (clj->js spec)
-                        :signalListeners (clj->js listeners)
+                        :signalListeners (clj->js listeners) ;TODO this has also been removed in react-vaga v8.
                         :actions (boolean (config/config :dev-mode))}]))
 
 (def vega-adapter (reagent/adapt-react-class rv/Vega))

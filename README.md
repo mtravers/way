@@ -2,7 +2,7 @@
 
 The way that can be named is not the eternal way. – Lao Tzu
 
-A base for building data-oriented websites it Clojure, ClojureScript, and Vega. Does nothing especially new or fancy, just brings what I need together in one place.
+A base for building data-oriented websites in Clojure, ClojureScript, and Vega. 
 
 [Demo site](https://way-demo-4ed0361a3a3b.herokuapp.com/)
 
@@ -20,14 +20,6 @@ A base for building data-oriented websites it Clojure, ClojureScript, and Vega. 
 - Ag-grid wrapping for data tables
 - Rich text editor
 - OAuth supprt
-
-## Users
-
-Way demo
-Wayne (PICI/Stanford BRUCE Portal)
-Traverse (CDD)
-MGen 2.0 (CDD)
-
 
 ## Clustered Heatmaps
 
@@ -56,7 +48,7 @@ To run locally:
 - NodeJS
 - Leiningen
     
-### Run
+### Run Demo
 
     npm install
     lein shadow compile app

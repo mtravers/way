@@ -275,12 +275,12 @@ setter #(let [value @(rf/subscribe [::edited-value key])]
   [& [size]]
   (let [size (or size 10)]
     ;; [:div.text-center
-    [:div.spinner-border.pici-purple {:role "status"
-                                      :style {:width (str size "em")
-                                              :height (str size "em")
-                                              :border-width (str (/ size 10.0) "em")}}
-     ]))
-
+    [:div.spinner-border {:role "status"
+                          :style {:width (str size "em")
+                                  :height (str size "em")
+                                  :flex-shrink 0
+                                  :border-width (str (/ size 10.0) "em")}}
+     [:span.visually-hidden "Loading..."]]))
 
 (defn open-in-browser-tab
   [url name]
