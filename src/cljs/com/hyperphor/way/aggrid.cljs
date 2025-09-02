@@ -6,7 +6,6 @@
             ["ag-grid-react" :as agr]
             [org.candelbio.multitool.core :as u]
             [com.hyperphor.way.web-utils :as wu]
-            [reagent.dom]
             [clojure.string :as str]
             )
   #_ (:require-macros
@@ -34,13 +33,24 @@
   [x]
   (into {} (for [k (.keys js/Object x)] [(keyword k) (aget x k)])))
 
-(defmulti ag-col-def (fn [col col-defs]
-                        col))
+;;; TODO needs some work
+(defmulti ag-col-def (fn [col {:keys [url-template multiple?]:as col-def}]
+                       (if (or url-template multiple?)
+                         :html
+                         :default)))
 
-;;; Default column supports (TODO break these out and use only when needed?)
+;;; Change default to really just use default ag-grid machinery, will save a world of pain
+(defmethod ag-col-def :default
+  [col _]
+  {:headerName (name col)
+   :field col
+   }
+  )
+
+;;; :html, supoorts url-template, multiple values with count. (TODO split those out? But might want both behaviors)
 ;;; url-templates using %s format (TODO use u/expand-template)
 ;;; multiple values (with count)
-(defmethod ag-col-def :default
+(defmethod ag-col-def :html
   [col {:keys [url-template] :as col-def}]
   {:headerName (name col)
    :field col
@@ -49,8 +59,8 @@
                          render (if url-template
                                   (fn [v] [:a.ent {:href (wu/js-format url-template v) :target "_ext"} (js/decodeURIComponent (str v))])
                                   (fn [v] [:span (str v)]))]
-                     (reagent.dom/render ;TODO this is not approved for React 18, but I couldn't figure a better way.
-                       [:span.ag-cell-wrap-text   ;; .ag-cell-auto-height doesn't work, unfortunately.
+                     (reagent.core/as-element 
+                      [:span.ag-cell-wrap-text   ;; .ag-cell-auto-height doesn't work, unfortunately.
                         (if (vector? value)
                           [:span
                            (when (> (count value) 1)
@@ -58,8 +68,7 @@
                            (for [elt (butlast value)]
                              [:span (render elt) ", "])
                            (render (last value))]
-                          (render value))]
-                       (.-eGridCell params))))
+                          (render value))])))
    }
   )
 
@@ -72,8 +81,9 @@
   class: css class to use for grid
   col-defs: a map of col ids to maps. Fields are the standard ag-grid plus:
      :url-template : a format string from values to URL links
+     :multiple? : support multiple elements, with count and truncation
 "
-  [data & {:keys [checkboxes? class col-defs id columns ag-grid-options]}]
+  [data & {:keys [checkboxes? autosize? class col-defs id columns ag-grid-options]}]
   (let [columns (or columns (keys (first data)))
         id (or id (gensym "ag"))
         column-defs (mapv #(ag-col-def % (get col-defs %)) columns)]
@@ -88,9 +98,10 @@
                               }
               :onGridReady (fn [params]
                              (swap! ag-apis assoc id (.-api params)))
-              :onFirstDataRendered (fn [params]
-                                     (let [column-api (.-columnApi params)] 
-                                       (.autoSizeColumns column-api (apply array (map :field column-defs)))))
+              :onFirstDataRendered (when autosize?
+                                     (fn [params]
+                                       (let [api (.-api params)] 
+                                         (.autoSizeAllColumns api))))
               :columnDefs column-defs
               :rowData data
               :onColumnHeaderClicked (fn [params]

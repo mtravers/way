@@ -9,7 +9,7 @@
 ;;; TODO param stuff should go through here. Or do we need both levels of abstraction?
 ;;; TODO way to supply extras or customizations
 ;;; TODO should probably incorporate component library like https://mantine.dev/
-
+;;; TODO password field
 
 (rf/reg-sub
  :form-field-value
@@ -39,10 +39,6 @@
 (defmulti form-field (fn [{:keys [type path label id hidden? disabled? doc] :as args}]
                        type))
 
-;;; Note: not actually specialized at all, so maybe doesnt need to be a method
-(defmulti form-field-row (fn [{:keys [type path label id hidden? disabled? doc] :as args}]
-                           type))
-
 ;;; TODO want a slightly more abstract validation mechanism
 (defmulti form-field-warnings (fn [{:keys [type path label id hidden? disabled? doc] :as args}]
                                 type))
@@ -59,10 +55,11 @@
           (empty? value) nil
           :else [:span.alert.alert-warning "Value must be numeric"])))
 
-(defmethod form-field-row :default
+(defn form-field-row
   [{:keys [type path label id hidden? disabled? doc] :as args}]
   (let [label (or label (name (last path)))
         id (or id (str/join "-" (map name path)))]
+    ^{:key (str "row" id)}
     [:div.row
      [:label.col-sm-2.col-form-label {:for id} label]
      [:div.col-8
@@ -86,6 +83,7 @@
       :value value
       ;;    :disabled false
       :on-change (fn [e]
+                   (prn :foo (-> e .-target .-value) (value-fn (-> e .-target .-value)))
                    (rf/dispatch
                     [:set-form-field-value path (value-fn (-> e .-target .-value))]))
       ;; TODO
@@ -94,7 +92,8 @@
                               nil))
       }]))
 
-;;; TODO restrict keys or show warning if content is not legal number
+;;; TODO restrict chars
+;;; TODO bug, you can't type "3." partly because weird parseFloat behavior...I think it means I need to store both string and parsed value in the db
 (defmethod form-field :number
   [{:keys [] :as args}]
   (form-field (assoc args :type :default :value-fn u/coerce-numeric)))
@@ -112,7 +111,6 @@
     }])
 
 ;;; TODO Rich text with BlockType
-
 
 ;;; TODO producing react warnings
 (defmethod form-field :boolean
@@ -138,6 +136,7 @@
    (doall 
     (for [elt elements
           :let [id (str/join "-" (cons id (map name (conj path elt))))]]
+      ^{:key (str "e" id)}
       [:span.form-check.form-check-inline
        {:style style}
        [:label.form-check-label {:for id} (name elt)]
@@ -160,6 +159,7 @@
     [:div
      (doall
     (for [elt elements]
+      ^{:key (str "e" id elt)}
       [:span.form-check.form-check-inline
        {:style style}
        [:label.form-check-label {:for id} (name elt)]
@@ -183,8 +183,7 @@
     (wu/select-widget id value dispatch options nil disabled?)))
 
 ;;; TODO multiselect
-
-
+;;; TODO select from a data feed (see https://github.com/mtravers/exobrain/blob/source-docs/src/cljs/exobrain/ui/forms.cljs#L174)
 
 ;;; For upload
 (defmethod form-field :local-files
@@ -260,6 +259,7 @@
              [path @(rf/subscribe [:form-field-value path])])))))
 
 ;;; TODO separate non-SPA for files??
+;;; TODO THis is completely broke, gather-fields calls subscribe which is not legal
 (defn wform
   [fields action]
   [:div.wform                           ;Not :form, to prevent a page trnasition

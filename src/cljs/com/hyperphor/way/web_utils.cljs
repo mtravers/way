@@ -28,9 +28,34 @@
    (or popup "documentation")
    #(.open js/window url "_doc")))
 
+(defn url-decode
+  [s]
+  (js/decodeURIComponent s))
+
 (defn browser-url
   []
   (url/url (-> js/window .-location .-href)))
+
+(defn browser-pathname
+  []
+  (-> js/window .-location .-pathname))
+
+(defn browser-path
+  []
+  (str/split (subs (browser-pathname) 1) "/"))
+
+(defn browser-params
+  "Parse query string parameters from a URL"
+  []
+  (let [query-string (-> js/window .-location .-search (subs 1))]
+    (->> (str/split query-string #"&")
+         (map #(str/split % #"=" 2))
+         (reduce (fn [acc [k v]]
+                   (assoc acc 
+                          (keyword (url-decode k))
+                          (url-decode (or v ""))))
+                 {}))))
+
 
 (def none-value "--none--")             ;Need a non-nil value to mean none.
 
@@ -250,12 +275,12 @@ setter #(let [value @(rf/subscribe [::edited-value key])]
   [& [size]]
   (let [size (or size 10)]
     ;; [:div.text-center
-    [:div.spinner-border.pici-purple {:role "status"
-                                      :style {:width (str size "em")
-                                              :height (str size "em")
-                                              :border-width (str (/ size 10.0) "em")}}
-     ]))
-
+    [:div.spinner-border {:role "status"
+                          :style {:width (str size "em")
+                                  :height (str size "em")
+                                  :flex-shrink 0
+                                  :border-width (str (/ size 10.0) "em")}}
+     [:span.visually-hidden "Loading..."]]))
 
 (defn open-in-browser-tab
   [url name]
@@ -280,3 +305,7 @@ setter #(let [value @(rf/subscribe [::edited-value key])]
     (-> term
         name
         (str/replace "_" " "))))
+
+(defn set-page-title
+  [s]
+  (set! (.-title (.-document js/window)) s))

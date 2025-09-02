@@ -3,6 +3,7 @@
             [org.candelbio.multitool.core :as u]
             [org.candelbio.multitool.cljcore :as ju]
             [org.candelbio.multitool.math :as mu]
+            [com.hyperphor.way.config :as config]
             [clojure.string :as str]
             [clojure.data.json :as json]
             [clojure.java.io :as io]
@@ -51,9 +52,11 @@
   (map #(u/map-values u/coerce-numeric %) ds))
 
 ;;; TODO this looks like a massive security hole. Although what harm can parsing json do?
+;;; doesn't work on local urls
 (defn url-data
-  [{:keys [url]}]
-  (let [ext (file-ext url)
+  [{:keys [data-id]}]
+  (let [url (second data-id)
+        ext (file-ext url)
         base (case ext
                "json" (-> url
                           slurp
@@ -85,7 +88,9 @@
   [params]
   (url-data params))
 
-
+(defmethod data :config
+  [_]
+  (config/config))
 
 
 

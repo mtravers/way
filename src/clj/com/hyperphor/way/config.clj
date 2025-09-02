@@ -7,8 +7,10 @@
             ))
 
 ;;; Generalized config mechanism. For actual vars, see resources/demo/config.edn
+;;; Read via Aero 
+;;; accessible on client via data feed mechanism.
+;;; NOTE this is mostly for static app config, but could easily support user-specific config. 
 
-;;; TODO make accessible on client
 ;;; TODO make accessible at compile time?
 
 (defmethod aero/reader 'split

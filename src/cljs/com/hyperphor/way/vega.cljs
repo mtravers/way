@@ -4,7 +4,6 @@
    [clojure.walk :as walk]
    [com.hyperphor.way.ui.config :as config]
    [reagent.core :as reagent]
-   [re-frame.core :as rf]
    ["react-vega" :as rv]))
 
 ;;; TODO some convenient way to call vl → vega compiler
@@ -15,11 +14,12 @@
 
 ;;; TODO data is being overused, omitting it should not hide the thing
 (defn vega-lite-view
-  [spec data]
+  [spec data & {:keys [listeners]}]
   (when data
-    [vega-lite-adapter {:data (clj->js data)
+    [vega-lite-adapter {:data (clj->js data) ;TODO this has been removed in react-vaga v8. See https://github.com/vega/react-vega?tab=readme-ov-file#3-subscribe-to-signal-events
                         :spec (clj->js spec)
-                        :actions (config/config :dev-mode)}]))
+                        :signalListeners (clj->js listeners) ;TODO this has also been removed in react-vaga v8.
+                        :actions (boolean (config/config :dev-mode))}]))
 
 (def vega-adapter (reagent/adapt-react-class rv/Vega))
 
@@ -28,17 +28,22 @@
 ;;;      :on [{:events "symbol:click" :update "datum"}]}
 
 ;;; listeners: eg: {"click" (fn [_ v] (rf/dispatch [:vega-click v]))}
+;;; TODO :actions should be a param 
 (defn vega-view
   [spec data & {:keys [listeners]}]
   (when data
     [vega-adapter {:data (clj->js data)
                    :spec (clj->js spec)
                    :signalListeners (clj->js listeners)
-                   :actions (config/config :dev-mode)
+                   :actions (boolean (config/config :dev-mode))
                    }]))
 
 ;;; ⟐⚇⟐ spec manipulators ⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇⟐⚇
 
+;;; Use this in specs when field name might have dots or other problematic characters.
+(defn bracketize
+  [s]
+  (when s (str "[" s "]")))
 
 (defn- patch-matches?
   [id thing]

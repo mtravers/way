@@ -43,10 +43,10 @@
      :body data}))
 
 (defn spa
-  []
+  [& args]
   (response/content-type
    (content-response
-    (html/html-frame-spa))
+    (apply html/html-frame-spa args))
    "text/html"))
 
 (defroutes base-site-routes

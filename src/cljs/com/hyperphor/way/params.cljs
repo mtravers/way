@@ -44,7 +44,7 @@
  :update-param
  (fn [db [_ data-id param f & args]]
    (let [v (get-in db [:params data-id param])]
-     (set-param db [:foo data-id param (apply f v args)]))))
+     (set-param db [:foo data-id param (apply f v args)])))) ;TODO :foo?
 
 (rf/reg-sub
  :param
@@ -52,6 +52,11 @@
    (if (vector? param)
      (get-in db (concat [:params data-id] param))
      (get-in db [:params data-id param]))))
+
+(rf/reg-sub
+ :params
+ (fn [db [_ data-id]]
+   (get-in db [:params data-id])))
 
 (defn safe-name
   [thing]
